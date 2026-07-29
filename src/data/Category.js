@@ -1,0 +1,18 @@
+export const categories = [
+  {id: '1', name: 'Fruits', icon: '🍎'},
+  {id: '2', name: 'Vegetables', icon: '🥬'},
+  {id: '3', name: 'Dairy', icon: '🥛'},
+  {id: '4', name: 'Grocery', icon: '🛒'},
+  {id: '5', name: 'Bakery', icon: '🍞'},
+  {id: '6', name: 'Beverages', icon: '🥤'},
+  {id: '7', name: 'Snacks', icon: '🍪'},
+  {id: '8', name: 'Personal Care', icon: '🧴'},
+  {id: '9', name: 'Cleaning', icon: '🧼'},
+  {id: '10', name: 'Stationery', icon: '📚'},
+  {id: '11', name: 'Medicines', icon: '💊'},
+  {id: '12', name: 'Baby Care', icon: '👶'},
+  {id: '13', name: 'Pet Care', icon: '🐶'},
+  {id: '14', name: 'Electronics', icon: '🔋'},
+  {id: '15', name: 'Beauty', icon: '💄'},
+  {id: '16', name: 'Flowers', icon: '🌸'},
+];
