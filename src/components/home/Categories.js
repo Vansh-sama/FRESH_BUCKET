@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 
-import CategoryCard from './CategoryCard';
-import {categories} from '../data/categories';
+import CategoryCard from './cards/CaregoryCards';
+import {categories} from '../data/Category';
 
 const Categories = () => {
   return (
