@@ -18,6 +18,7 @@ const SignupScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
 
   const handleSignup = () => {
@@ -37,6 +38,24 @@ const SignupScreen = ({navigation}) => {
     navigation.navigate('Login');
   };
 
+  const handleGoogleSignup = () => {
+    // TODO: wire up Google OAuth once backend/social auth is ready
+  };
+
+  const handleAppleSignup = () => {
+    // TODO: wire up Apple Sign In once backend/social auth is ready
+  };
+
+  // Lets people explore the app (Home/Categories/Cart browsing) without
+  // creating an account first — same pattern as Zomato/Blinkit. Swap
+  // 'MainTabs' below for whatever your main-stack route name actually is.
+  const handleSkip = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'MainTabs'}],
+    });
+  };
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: Colors.background}}
@@ -45,12 +64,27 @@ const SignupScreen = ({navigation}) => {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        {/* Back */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
-        </TouchableOpacity>
+        {/* Back + Skip row */}
+        <View style={styles.topRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.skipButton}
+            activeOpacity={0.85}
+            onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip</Text>
+            <Ionicons
+              name="arrow-forward-circle-outline"
+              size={18}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.header}>
           <View style={styles.logoCircle}>
@@ -114,7 +148,9 @@ const SignupScreen = ({navigation}) => {
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <TouchableOpacity
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={20}
@@ -135,13 +171,27 @@ const SignupScreen = ({navigation}) => {
             style={styles.input}
             placeholder="Confirm password"
             placeholderTextColor={Colors.textMuted}
-            secureTextEntry={!showPassword}
+            secureTextEntry={!showConfirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
+          <TouchableOpacity
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Ionicons
+              name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={Colors.textMuted}
+            />
+          </TouchableOpacity>
         </View>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error ? (
+          <View style={styles.errorRow}>
+            <Ionicons name="alert-circle-outline" size={16} color={Colors.error} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
 
         <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
           <Text style={styles.signupButtonText}>Create Account</Text>
@@ -153,7 +203,9 @@ const SignupScreen = ({navigation}) => {
           <View style={styles.dividerLine} />
         </View>
 
-        <TouchableOpacity style={[styles.socialButton, styles.googleButton]}>
+        <TouchableOpacity
+          style={[styles.socialButton, styles.googleButton]}
+          onPress={handleGoogleSignup}>
           <Ionicons
             name="logo-google"
             size={20}
@@ -163,7 +215,9 @@ const SignupScreen = ({navigation}) => {
           <Text style={styles.socialButtonText}>Continue with Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.socialButton, styles.appleButton]}>
+        <TouchableOpacity
+          style={[styles.socialButton, styles.appleButton]}
+          onPress={handleAppleSignup}>
           <Ionicons
             name="logo-apple"
             size={22}
@@ -195,10 +249,29 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.lg,
     paddingBottom: Spacing.xl,
   },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   backButton: {
     width: 40,
     height: 40,
     justifyContent: 'center',
+  },
+  skipButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primarySoft,
+  },
+  skipText: {
+    ...Typography.bodyBold,
+    color: Colors.primary,
+    marginRight: 4,
+    fontSize: 14,
   },
   header: {
     alignItems: 'center',
@@ -242,10 +315,15 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     height: '100%',
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
   errorText: {
     ...Typography.caption,
     color: Colors.error,
-    marginBottom: Spacing.md,
+    marginLeft: 6,
   },
   signupButton: {
     backgroundColor: Colors.primary,

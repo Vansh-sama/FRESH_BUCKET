@@ -1,18 +1,33 @@
-import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Colors, Spacing} from '../../theme';
+import React, {useRef, useEffect} from 'react';
+import {View, StyleSheet, Animated} from 'react-native';
 
-// Purely presentational dot row - takes the total count and which index
-// is active, renders nothing else. Reusable anywhere else you paginate
-// (e.g. a future promo carousel on Home).
+const Dot = ({active}) => {
+  const widthAnim = useRef(new Animated.Value(active ? 32 : 10)).current;
+
+  useEffect(() => {
+    Animated.spring(widthAnim, {
+      toValue: active ? 32 : 10,
+      useNativeDriver: false,
+      friction: 8,
+    }).start();
+  }, [active]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.dot,
+        {width: widthAnim},
+        active && styles.activeDot,
+      ]}
+    />
+  );
+};
+
 const Pagination = ({count, activeIndex}) => {
   return (
-    <View style={styles.row}>
+    <View style={styles.container}>
       {Array.from({length: count}).map((_, index) => (
-        <View
-          key={index}
-          style={[styles.dot, index === activeIndex && styles.dotActive]}
-        />
+        <Dot key={index} active={activeIndex === index} />
       ))}
     </View>
   );
@@ -21,20 +36,25 @@ const Pagination = ({count, activeIndex}) => {
 export default Pagination;
 
 const styles = StyleSheet.create({
-  row: {
+  container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: Spacing.lg,
+    alignItems: 'center',
+
+    marginTop: 30,
+    marginBottom: 36,
   },
+
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.border,
-    marginHorizontal: 4,
+    height: 10,
+    borderRadius: 5,
+
+    backgroundColor: '#D7D7D7',
+
+    marginHorizontal: 6,
   },
-  dotActive: {
-    backgroundColor: Colors.primary,
-    width: 20,
+
+  activeDot: {
+    backgroundColor: '#2E7D32',
   },
 });
