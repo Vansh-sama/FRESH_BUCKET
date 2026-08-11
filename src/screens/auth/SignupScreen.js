@@ -10,27 +10,50 @@ import {
   Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Colors, Typography, Spacing, Radius} from '../../theme';
+import {Colors, Spacing, Typography, Radius} from '../../theme';
 
-const LoginScreen = ({navigation, onLoginSuccess}) => {
+const SignupScreen = ({navigation}) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    // TODO: replace with real auth call (Firebase / your backend)
-    // Keeping this local so the flow is testable end-to-end right now.
-    onLoginSuccess && onLoginSuccess();
+  const handleSignup = () => {
+    // Basic client-side check now; real validation + API call comes once
+    // the backend (Node/Express/JWT) exists. Keeping this local for now
+    // means you can still demo the full flow before the backend is ready.
+    if (!name || !email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    setError('');
+    // TODO: call POST /api/auth/signup once backend exists, then navigate
+    navigation.navigate('Login');
   };
 
-  const handleGoogleLogin = () => {
-    // TODO: wire up @react-native-google-signin/google-signin
-    console.log('Continue with Google pressed');
+  const handleGoogleSignup = () => {
+    // TODO: wire up Google OAuth once backend/social auth is ready
   };
 
-  const handleAppleLogin = () => {
-    // TODO: wire up @invertase/react-native-apple-authentication (iOS only)
-    console.log('Continue with Apple pressed');
+  const handleAppleSignup = () => {
+    // TODO: wire up Apple Sign In once backend/social auth is ready
+  };
+
+  // Lets people explore the app (Home/Categories/Cart browsing) without
+  // creating an account first — same pattern as Zomato/Blinkit. Swap
+  // 'MainTabs' below for whatever your main-stack route name actually is.
+  const handleSkip = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'MainTabs'}],
+    });
   };
 
   return (
@@ -41,15 +64,53 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        {/* Header */}
+        {/* Back + Skip row */}
+        <View style={styles.topRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.skipButton}
+            activeOpacity={0.85}
+            onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip</Text>
+            <Ionicons
+              name="arrow-forward-circle-outline"
+              size={18}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.header}>
           <View style={styles.logoCircle}>
             <Ionicons name="leaf" size={30} color={Colors.primary} />
           </View>
-          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>
-            Log in to continue shopping fresh
+            Sign up to start shopping fresh
           </Text>
+        </View>
+
+        {/* Name */}
+        <View style={styles.inputWrap}>
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color={Colors.textMuted}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Full name"
+            placeholderTextColor={Colors.textMuted}
+            value={name}
+            onChangeText={setName}
+          />
         </View>
 
         {/* Email */}
@@ -87,7 +148,9 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <TouchableOpacity
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={20}
@@ -96,28 +159,53 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.forgotWrap}
-          onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgotText}>Forgot password?</Text>
+        {/* Confirm Password */}
+        <View style={styles.inputWrap}>
+          <Ionicons
+            name="lock-closed-outline"
+            size={20}
+            color={Colors.textMuted}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm password"
+            placeholderTextColor={Colors.textMuted}
+            secureTextEntry={!showConfirmPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <TouchableOpacity
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Ionicons
+              name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={Colors.textMuted}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {error ? (
+          <View style={styles.errorRow}>
+            <Ionicons name="alert-circle-outline" size={16} color={Colors.error} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+          <Text style={styles.signupButtonText}>Create Account</Text>
         </TouchableOpacity>
 
-        {/* Primary CTA */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Log In</Text>
-        </TouchableOpacity>
-
-        {/* Divider */}
         <View style={styles.dividerRow}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>or continue with</Text>
           <View style={styles.dividerLine} />
         </View>
 
-        {/* Social buttons */}
         <TouchableOpacity
           style={[styles.socialButton, styles.googleButton]}
-          onPress={handleGoogleLogin}>
+          onPress={handleGoogleSignup}>
           <Ionicons
             name="logo-google"
             size={20}
@@ -129,7 +217,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         <TouchableOpacity
           style={[styles.socialButton, styles.appleButton]}
-          onPress={handleAppleLogin}>
+          onPress={handleAppleSignup}>
           <Ionicons
             name="logo-apple"
             size={22}
@@ -141,11 +229,10 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
           </Text>
         </TouchableOpacity>
 
-        {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.footerLink}>Sign up</Text>
+          <Text style={styles.footerText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.footerLink}>Log in</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -153,14 +240,38 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
   );
 };
 
-export default LoginScreen;
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xxl,
+    paddingTop: Spacing.lg,
     paddingBottom: Spacing.xl,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+  },
+  skipButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primarySoft,
+  },
+  skipText: {
+    ...Typography.bodyBold,
+    color: Colors.primary,
+    marginRight: 4,
+    fontSize: 14,
   },
   header: {
     alignItems: 'center',
@@ -204,16 +315,17 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     height: '100%',
   },
-  forgotWrap: {
-    alignSelf: 'flex-end',
-    marginBottom: Spacing.lg,
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
   },
-  forgotText: {
-    ...Typography.bodyBold,
-    color: Colors.primary,
-    fontSize: 13,
+  errorText: {
+    ...Typography.caption,
+    color: Colors.error,
+    marginLeft: 6,
   },
-  loginButton: {
+  signupButton: {
     backgroundColor: Colors.primary,
     borderRadius: Radius.md,
     height: 52,
@@ -226,7 +338,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  loginButtonText: {
+  signupButtonText: {
     ...Typography.h3,
     color: Colors.textInverse,
   },
