@@ -2,7 +2,7 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import HomeScreen from '../screens/Home/Home';
+import HomeScreen from '../screens/home/Home';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
