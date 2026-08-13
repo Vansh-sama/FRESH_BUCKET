@@ -7,6 +7,7 @@ const Radius = {
   xxl: 30,
 
   round: 999,
+  pill: 999,
 };
 
 export default Radius;

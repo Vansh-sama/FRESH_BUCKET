@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import {Colors, Spacing, Radius, Typography} from '../theme';
 
 // Presentational only - the parent screen owns the value/state and

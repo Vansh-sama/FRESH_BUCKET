@@ -10,7 +10,7 @@ const Typography = {
   },
 
   h3: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
   },
 
@@ -21,7 +21,7 @@ const Typography = {
 
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
   bodyLarge: {
@@ -32,6 +32,11 @@ const Typography = {
   body: {
     fontSize: 16,
     fontWeight: '400',
+  },
+
+  bodyBold: {
+    fontSize: 16,
+    fontWeight: '700',
   },
 
   bodySmall: {
@@ -46,7 +51,7 @@ const Typography = {
 
   button: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
   tiny: {

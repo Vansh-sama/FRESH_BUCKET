@@ -1,254 +1,350 @@
 import React, {useEffect, useRef} from 'react';
+
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   Animated,
   Easing,
   StatusBar,
-  Image,
 } from 'react-native';
 
 import LinearGradient from 'react-native-linear-gradient';
 
 import {
   Colors,
+  Spacing,
   Typography,
- Spacing,
   Radius,
-  Shadows,
 } from '../../theme';
 
 const SplashScreen = ({navigation}) => {
-  const logoScale = useRef(new Animated.Value(0.7)).current;
+  const logoScale = useRef(new Animated.Value(0.82)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
 
-  const textOpacity = useRef(new Animated.Value(0)).current;
-  const textTranslate = useRef(new Animated.Value(25)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const contentTranslate = useRef(new Animated.Value(18)).current;
 
   const loaderOpacity = useRef(new Animated.Value(0)).current;
-
-  const floatAnimation = useRef(new Animated.Value(0)).current;
+  const spinnerRotation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(logoScale, {
-          toValue: 1,
-          duration: 900,
-          easing: Easing.out(Easing.exp),
-          useNativeDriver: true,
-        }),
+    Animated.parallel([
+      Animated.timing(logoScale, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.out(Easing.back(1.1)),
+        useNativeDriver: true,
+      }),
 
-        Animated.timing(logoOpacity, {
-          toValue: 1,
-          duration: 900,
-          useNativeDriver: true,
-        }),
-      ]),
-
-      Animated.parallel([
-        Animated.timing(textOpacity, {
-          toValue: 1,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-
-        Animated.timing(textTranslate, {
-          toValue: 0,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-
-        Animated.timing(loaderOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
+      Animated.timing(logoOpacity, {
+        toValue: 1,
+        duration: 650,
+        useNativeDriver: true,
+      }),
     ]).start();
 
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(floatAnimation, {
-          toValue: -8,
-          duration: 1800,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
+    Animated.parallel([
+      Animated.timing(contentOpacity, {
+        toValue: 1,
+        duration: 650,
+        delay: 400,
+        useNativeDriver: true,
+      }),
 
-        Animated.timing(floatAnimation, {
-          toValue: 0,
-          duration: 1800,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ]),
+      Animated.timing(contentTranslate, {
+        toValue: 0,
+        duration: 650,
+        delay: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    Animated.timing(loaderOpacity, {
+      toValue: 1,
+      duration: 400,
+      delay: 900,
+      useNativeDriver: true,
+    }).start();
+
+    // Continuous spinner rotation
+    Animated.loop(
+      Animated.timing(spinnerRotation, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
     ).start();
 
     const timer = setTimeout(() => {
       navigation.replace('Onboarding');
-    }, 2800);
+    }, 3500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [
+    navigation,
+    logoScale,
+    logoOpacity,
+    contentOpacity,
+    contentTranslate,
+    loaderOpacity,
+    spinnerRotation,
+  ]);
+
+  const spinnerSpin = spinnerRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
-    <>
+    <View style={styles.container}>
+
       <StatusBar
-        translucent
-        backgroundColor="transparent"
+        backgroundColor={Colors.primaryDark}
         barStyle="light-content"
       />
 
       <LinearGradient
         colors={[
-          '#1B5E20',
-          '#2E7D32',
-          '#4CAF50',
+          Colors.primaryDark,
+          Colors.primary,
+          Colors.primaryLight,
         ]}
-        style={styles.container}>
-        {/* Background Circles */}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={StyleSheet.absoluteFill}
+      />
 
-        <View style={styles.circleOne} />
+      {/* BACKGROUND DECORATION */}
 
-        <View style={styles.circleTwo} />
+      <View style={styles.circleTop} />
+      <View style={styles.circleBottom} />
+      <View style={styles.circleSmall} />
 
-        <View style={styles.circleThree} />
+      {/* MAIN CONTENT */}
+
+      <View style={styles.content}>
 
         <Animated.View
           style={[
-            styles.logoContainer,
+            styles.logoWrapper,
             {
               opacity: logoOpacity,
-              transform: [
-                {scale: logoScale},
-                {translateY: floatAnimation},
-              ],
+              transform: [{scale: logoScale}],
             },
           ]}>
-          <Image
-            source={require('../../assets/logos/freshbasket_logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+
+          <View style={styles.logoBackground}>
+
+            <Image
+              source={require('../../assets/images/onboarding/grocery1.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+
+          </View>
+
         </Animated.View>
 
         <Animated.View
-          style={{
-            opacity: textOpacity,
-            transform: [{translateY: textTranslate}],
-          }}>
+          style={[
+            styles.textContainer,
+            {
+              opacity: contentOpacity,
+              transform: [{translateY: contentTranslate}],
+            },
+          ]}>
+
           <Text style={styles.title}>
             Fresh Basket
           </Text>
 
           <Text style={styles.subtitle}>
-            Everything Fresh,{'\n'}
-            Right at Your Doorstep
+            Everything Fresh,{' '}
+            <Text style={styles.subtitleHighlight}>
+              Right at Your Doorstep
+            </Text>
           </Text>
+
         </Animated.View>
+
+      </View>
+
+      {/* LOADER */}
+
+      <Animated.View
+        style={[
+          styles.loaderContainer,
+          {
+            opacity: loaderOpacity,
+          },
+        ]}>
 
         <Animated.View
           style={[
-            styles.loadingContainer,
+            styles.spinner,
             {
-              opacity: loaderOpacity,
+              transform: [{rotate: spinnerSpin}],
             },
-          ]}>
-          <View style={styles.dot} />
+          ]}
+        />
 
-          <View style={[styles.dot, styles.middleDot]} />
+        <Text style={styles.loadingText}>
+          Loading...
+        </Text>
 
-          <View style={styles.dot} />
-        </Animated.View>
-      </LinearGradient>
-    </>
+      </Animated.View>
+
+    </View>
   );
 };
 
 export default SplashScreen;
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
 
-  logoContainer: {
+  /* BACKGROUND */
+
+  circleTop: {
+    position: 'absolute',
+    width: 330,
+    height: 330,
+    borderRadius: 165,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    top: -150,
+    right: -100,
+  },
+
+  circleBottom: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    bottom: -140,
+    left: -120,
+  },
+
+  circleSmall: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    top: 160,
+    left: -40,
+  },
+
+  /* CONTENT */
+
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -35,
+  },
+
+  logoWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
   },
 
+  /*
+    Reference image:
+    white rounded square ≈ 185-195px
+  */
+
+  logoBackground: {
+    width: 190,
+    height: 190,
+    borderRadius: 28,
+
+    backgroundColor: 'rgba(255,255,255,0.96)',
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+
+  /*
+    Keep the actual image slightly smaller
+    so it has a clean white margin.
+  */
+
   logo: {
-    width: 210,
-    height: 210,
+    width: 165,
+    height: 165,
+  },
+
+  /* TEXT */
+
+  textContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
 
   title: {
-    marginTop: Spacing.xl,
-    ...Typography.h1,
+    fontSize: 28,
     fontWeight: '800',
     color: Colors.white,
-    letterSpacing: 1,
+    letterSpacing: 0.2,
     textAlign: 'center',
   },
 
   subtitle: {
-    marginTop: 12,
-    ...Typography.body,
+    marginTop: 8,
+    fontSize: 14,
     color: 'rgba(255,255,255,0.85)',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 21,
   },
 
-  loadingContainer: {
+  subtitleHighlight: {
+    color: Colors.white,
+    fontWeight: '700',
+  },
+
+  /* LOADER */
+
+  loaderContainer: {
     position: 'absolute',
-    bottom: 80,
-    flexDirection: 'row',
+    bottom: 90,
     alignItems: 'center',
   },
 
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: Radius.round,
-    backgroundColor: Colors.white,
-    opacity: 0.7,
+  spinner: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.25)',
+    borderTopColor: Colors.white,
+    borderRightColor: Colors.white,
   },
 
-  middleDot: {
-    marginHorizontal: 10,
+  loadingText: {
+    marginTop: 12,
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+    letterSpacing: 0.3,
   },
 
-  circleOne: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    top: -70,
-    right: -60,
-  },
-
-  circleTwo: {
-    position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    bottom: -40,
-    left: -50,
-  },
-
-  circleThree: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    top: 180,
-    left: 40,
-  },
 });
