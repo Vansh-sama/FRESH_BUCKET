@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import SplashScreen from '../screens/Splash/SplashScreen';
@@ -8,65 +8,36 @@ import MainStack from './MainStack';
 
 const Stack = createNativeStackNavigator();
 
-export default function AppNavigator() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFirstLaunch, setIsFirstLaunch] = useState(true);
-  const [isSignedUp, setIsSignedUp] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
+const AppNavigator = () => {
   return (
     <Stack.Navigator
+      initialRouteName="Splash"
       screenOptions={{
         headerShown: false,
       }}>
 
-      {/* SPLASH */}
-      {isLoading ? (
-        <Stack.Screen
-          name="Splash"
-          component={SplashScreen}
-        />
-      ) : isFirstLaunch ? (
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+      />
 
-        /* ONBOARDING */
-        <Stack.Screen name="Onboarding">
-          {props => (
-            <OnboardingScreen
-              {...props}
-              onDone={() => setIsFirstLaunch(false)}
-            />
-          )}
-        </Stack.Screen>
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+      />
 
-      ) : !isSignedUp ? (
+      <Stack.Screen
+        name="Signup"
+        component={SignupScreen}
+      />
 
-        /* SIGNUP */
-        <Stack.Screen name="Signup">
-          {props => (
-            <SignupScreen
-              {...props}
-              onSignupSuccess={() => setIsSignedUp(true)}
-            />
-          )}
-        </Stack.Screen>
-
-      ) : (
-
-        /* MAIN APP */
-        <Stack.Screen
-          name="Main"
-          component={MainStack}
-        />
-
-      )}
+      <Stack.Screen
+        name="Main"
+        component={MainStack}
+      />
 
     </Stack.Navigator>
   );
-}
+};
+
+export default AppNavigator;

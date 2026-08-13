@@ -1,19 +1,21 @@
 import React from 'react';
 
 import {
-  View,
-  Text,
   TouchableOpacity,
+  Text,
+  View,
   StyleSheet,
 } from 'react-native';
 
-import Ionicons from '@react-native-vector-icons/ionicons/static';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
   Colors,
-  Typography,
   Radius,
   Spacing,
+  Sizes,
+  Typography,
+  Shadows,
 } from '../../theme';
 
 const BottomButtons = ({
@@ -35,12 +37,8 @@ const BottomButtons = ({
         </Text>
 
         <Ionicons
-          name={
-            isLastSlide
-              ? 'checkmark'
-              : 'arrow-forward'
-          }
-          size={20}
+          name="arrow-forward"
+          size={Sizes.iconSmall}
           color={Colors.white}
         />
 
@@ -53,24 +51,31 @@ const BottomButtons = ({
 export default BottomButtons;
 
 const styles = StyleSheet.create({
+
   container: {
-    paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing.lg,
+    paddingHorizontal: Spacing.xs,
+
+    paddingBottom: Spacing.xs,
   },
 
   button: {
-    height: 56,
+    height: Sizes.buttonHeight,
 
-    borderRadius: Radius.md,
+    width: '100%',
+
+    borderRadius: Radius.pill,
 
     backgroundColor: Colors.primary,
 
     flexDirection: 'row',
 
     alignItems: 'center',
+
     justifyContent: 'center',
 
-    elevation: 4,
+    ...Shadows.medium,
+
+    shadowColor: Colors.primary,
   },
 
   buttonText: {
@@ -80,4 +85,5 @@ const styles = StyleSheet.create({
 
     marginRight: Spacing.sm,
   },
+
 });

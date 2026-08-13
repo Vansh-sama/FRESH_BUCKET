@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import Ionicons from '@react-native-vector-icons/ionicons/static';
+import Ionicons from '@react-native-vector-icons/ionicons';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
@@ -21,7 +21,7 @@ const BottomTabs = () => {
         tabBarShowLabel: true,
 
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textMuted,
+        tabBarInactiveTintColor: Colors.textLight,
 
         tabBarStyle: {
           height: 70,

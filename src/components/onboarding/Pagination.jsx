@@ -5,11 +5,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import {
-  Colors,
-  Spacing,
-  Radius,
-} from '../../theme';
+import {Colors} from '../../theme';
 
 const Pagination = ({
   count,
@@ -18,19 +14,19 @@ const Pagination = ({
   return (
     <View style={styles.container}>
 
-      {Array.from({length: count}).map((_, index) => (
+      {Array.from({length: count}).map(
+        (_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
 
-        <View
-          key={index}
-          style={[
-            styles.dot,
-            index === activeIndex
-              ? styles.activeDot
-              : styles.inactiveDot,
-          ]}
-        />
-
-      ))}
+              index === activeIndex &&
+                styles.activeDot,
+            ]}
+          />
+        ),
+      )}
 
     </View>
   );
@@ -39,32 +35,31 @@ const Pagination = ({
 export default Pagination;
 
 const styles = StyleSheet.create({
+
   container: {
     flexDirection: 'row',
 
-    justifyContent: 'center',
     alignItems: 'center',
 
-    marginBottom: Spacing.lg,
+    justifyContent: 'center',
+
+    height: 24,
+
+    gap: 8,
   },
 
   dot: {
+    width: 7,
+
     height: 7,
 
-    borderRadius: Radius.round,
+    borderRadius: 3.5,
 
-    marginHorizontal: 4,
+    backgroundColor: '#D5DCE0',
   },
 
   activeDot: {
-    width: 24,
-
     backgroundColor: Colors.primary,
   },
 
-  inactiveDot: {
-    width: 7,
-
-    backgroundColor: Colors.border,
-  },
 });

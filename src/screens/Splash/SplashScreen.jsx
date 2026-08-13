@@ -1,4 +1,5 @@
 import React, {useEffect, useRef} from 'react';
+
 import {
   View,
   Text,
@@ -13,88 +14,76 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {
   Colors,
-  Typography,
   Spacing,
+  Typography,
   Radius,
 } from '../../theme';
 
 const SplashScreen = ({navigation}) => {
-  const logoScale = useRef(new Animated.Value(0.75)).current;
+  const logoScale = useRef(new Animated.Value(0.82)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
 
   const contentOpacity = useRef(new Animated.Value(0)).current;
-  const contentTranslate = useRef(new Animated.Value(20)).current;
+  const contentTranslate = useRef(new Animated.Value(18)).current;
 
   const loaderOpacity = useRef(new Animated.Value(0)).current;
-  const loaderWidth = useRef(new Animated.Value(0)).current;
+  const spinnerRotation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // -----------------------------
-    // LOGO ANIMATION
-    // -----------------------------
     Animated.parallel([
       Animated.timing(logoScale, {
         toValue: 1,
-        duration: 900,
-        easing: Easing.out(Easing.back(1.2)),
+        duration: 800,
+        easing: Easing.out(Easing.back(1.1)),
         useNativeDriver: true,
       }),
 
       Animated.timing(logoOpacity, {
         toValue: 1,
-        duration: 700,
+        duration: 650,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // -----------------------------
-    // TEXT ANIMATION
-    // -----------------------------
     Animated.parallel([
       Animated.timing(contentOpacity, {
         toValue: 1,
-        duration: 700,
-        delay: 500,
+        duration: 650,
+        delay: 400,
         useNativeDriver: true,
       }),
 
       Animated.timing(contentTranslate, {
         toValue: 0,
-        duration: 700,
-        delay: 500,
+        duration: 650,
+        delay: 400,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
     ]).start();
 
-    // -----------------------------
-    // LOADER ANIMATION
-    // -----------------------------
     Animated.timing(loaderOpacity, {
       toValue: 1,
-      duration: 500,
-      delay: 1000,
+      duration: 400,
+      delay: 900,
       useNativeDriver: true,
     }).start();
 
-    Animated.timing(loaderWidth, {
-      toValue: 1,
-      duration: 2800,
-      delay: 1000,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
+    // Continuous spinner rotation
+    Animated.loop(
+      Animated.timing(spinnerRotation, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ).start();
 
-    // -----------------------------
-    // MOVE TO ONBOARDING
-    // -----------------------------
     const timer = setTimeout(() => {
       navigation.replace('Onboarding');
-    }, 4000);
+    }, 3500);
 
-    return () => {
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, [
     navigation,
     logoScale,
@@ -102,24 +91,21 @@ const SplashScreen = ({navigation}) => {
     contentOpacity,
     contentTranslate,
     loaderOpacity,
-    loaderWidth,
+    spinnerRotation,
   ]);
 
-  const progressWidth = loaderWidth.interpolate({
+  const spinnerSpin = spinnerRotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
+    outputRange: ['0deg', '360deg'],
   });
 
   return (
     <View style={styles.container}>
+
       <StatusBar
         backgroundColor={Colors.primaryDark}
         barStyle="light-content"
       />
-
-      {/* =================================
-          BACKGROUND GRADIENT
-      ================================== */}
 
       <LinearGradient
         colors={[
@@ -132,21 +118,16 @@ const SplashScreen = ({navigation}) => {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* =================================
-          DECORATIVE CIRCLES
-      ================================== */}
+      {/* BACKGROUND DECORATION */}
 
       <View style={styles.circleTop} />
-
       <View style={styles.circleBottom} />
-
       <View style={styles.circleSmall} />
 
-      {/* =================================
-          MAIN CONTENT
-      ================================== */}
+      {/* MAIN CONTENT */}
 
       <View style={styles.content}>
+
         <Animated.View
           style={[
             styles.logoWrapper,
@@ -155,31 +136,25 @@ const SplashScreen = ({navigation}) => {
               transform: [{scale: logoScale}],
             },
           ]}>
-          
+
           <View style={styles.logoBackground}>
+
             <Image
               source={require('../../assets/images/onboarding/grocery1.png')}
               style={styles.logo}
               resizeMode="contain"
             />
+
           </View>
 
         </Animated.View>
-
-        {/* =================================
-            TEXT
-        ================================== */}
 
         <Animated.View
           style={[
             styles.textContainer,
             {
               opacity: contentOpacity,
-              transform: [
-                {
-                  translateY: contentTranslate,
-                },
-              ],
+              transform: [{translateY: contentTranslate}],
             },
           ]}>
 
@@ -195,11 +170,10 @@ const SplashScreen = ({navigation}) => {
           </Text>
 
         </Animated.View>
+
       </View>
 
-      {/* =================================
-          LOADER
-      ================================== */}
+      {/* LOADER */}
 
       <Animated.View
         style={[
@@ -209,42 +183,29 @@ const SplashScreen = ({navigation}) => {
           },
         ]}>
 
-        <View style={styles.loaderTrack}>
-          <Animated.View
-            style={[
-              styles.loaderProgress,
-              {
-                width: progressWidth,
-              },
-            ]}
-          />
-        </View>
+        <Animated.View
+          style={[
+            styles.spinner,
+            {
+              transform: [{rotate: spinnerSpin}],
+            },
+          ]}
+        />
 
         <Text style={styles.loadingText}>
-          Freshness is on the way...
+          Loading...
         </Text>
 
       </Animated.View>
 
-      {/* =================================
-          BOTTOM BRANDING
-      ================================== */}
-
-      <Text style={styles.bottomText}>
-        FRESH • FAST • RELIABLE
-      </Text>
     </View>
   );
 };
 
 export default SplashScreen;
 
-
-/* =========================================================
-   STYLES
-========================================================= */
-
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -252,9 +213,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  /* =================================
-     DECORATIVE BACKGROUND
-  ================================== */
+  /* BACKGROUND */
 
   circleTop: {
     position: 'absolute',
@@ -286,14 +245,12 @@ const styles = StyleSheet.create({
     left: -40,
   },
 
-  /* =================================
-     MAIN CONTENT
-  ================================== */
+  /* CONTENT */
 
   content: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -40,
+    marginTop: -35,
   },
 
   logoWrapper: {
@@ -301,10 +258,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
+  /*
+    Reference image:
+    white rounded square ≈ 185-195px
+  */
+
   logoBackground: {
-    width: 230,
-    height: 230,
-    borderRadius: Radius.xxl,
+    width: 190,
+    height: 190,
+    borderRadius: 28,
 
     backgroundColor: 'rgba(255,255,255,0.96)',
 
@@ -314,108 +276,75 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 12,
+      height: 10,
     },
     shadowOpacity: 0.18,
-    shadowRadius: 20,
-
-    elevation: 12,
+    shadowRadius: 18,
+    elevation: 10,
   },
+
+  /*
+    Keep the actual image slightly smaller
+    so it has a clean white margin.
+  */
 
   logo: {
-    width: 205,
-    height: 205,
+    width: 165,
+    height: 165,
   },
 
-  /* =================================
-     TEXT
-  ================================== */
+  /* TEXT */
 
   textContainer: {
     alignItems: 'center',
-    marginTop: Spacing.xl,
-    paddingHorizontal: Spacing.lg,
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
 
   title: {
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: '800',
     color: Colors.white,
-    letterSpacing: 0.5,
+    letterSpacing: 0.2,
     textAlign: 'center',
   },
 
   subtitle: {
-    ...Typography.body,
-
-    marginTop: Spacing.sm,
-
-    color: 'rgba(255,255,255,0.82)',
-
+    marginTop: 8,
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
     textAlign: 'center',
-
-    lineHeight: 24,
+    lineHeight: 21,
   },
 
   subtitleHighlight: {
     color: Colors.white,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
-  /* =================================
-     LOADER
-  ================================== */
+  /* LOADER */
 
   loaderContainer: {
     position: 'absolute',
-    bottom: 80,
+    bottom: 90,
     alignItems: 'center',
   },
 
-  loaderTrack: {
-    width: 110,
-    height: 4,
-
-    borderRadius: 10,
-
-    backgroundColor: 'rgba(255,255,255,0.25)',
-
-    overflow: 'hidden',
-  },
-
-  loaderProgress: {
-    height: 4,
-
-    borderRadius: 10,
-
-    backgroundColor: Colors.white,
+  spinner: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.25)',
+    borderTopColor: Colors.white,
+    borderRightColor: Colors.white,
   },
 
   loadingText: {
-    ...Typography.caption,
-
     marginTop: 12,
-
-    color: 'rgba(255,255,255,0.75)',
-
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
     letterSpacing: 0.3,
   },
 
-  /* =================================
-     BOTTOM BRANDING
-  ================================== */
-
-  bottomText: {
-    position: 'absolute',
-
-    bottom: 30,
-
-    fontSize: 10,
-
-    fontWeight: '700',
-
-    color: 'rgba(255,255,255,0.55)',
-
-    letterSpacing: 2,
-  },
 });

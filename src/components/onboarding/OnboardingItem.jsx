@@ -8,42 +8,37 @@ import {
   Dimensions,
 } from 'react-native';
 
-import Ionicons from '@react-native-vector-icons/ionicons/static';
-
 import {
   Colors,
-  Typography,
   Spacing,
-  Radius,
+  Typography,
 } from '../../theme';
 
 const {width} = Dimensions.get('window');
+const CIRCLE_SIZE = width * 0.66;
 
 const OnboardingItem = ({item}) => {
   return (
     <View style={styles.container}>
 
-      {/* IMAGE / ICON */}
+      {/* ================================
+          IMAGE CIRCLE
+      ================================= */}
 
-      <View style={styles.imageContainer}>
+      <View style={styles.circleBackdrop}>
 
-        {item.image ? (
-          <Image
-            source={item.image}
-            style={styles.image}
-            resizeMode="contain"
-          />
-        ) : (
-          <Ionicons
-            name={item.icon || 'basket-outline'}
-            size={100}
-            color={Colors.primary}
-          />
-        )}
+        <Image
+          source={item.image}
+          style={styles.image}
+          resizeMode="contain"
+        />
 
       </View>
 
-      {/* TEXT */}
+
+      {/* ================================
+          TEXT
+      ================================= */}
 
       <View style={styles.textContainer}>
 
@@ -63,43 +58,69 @@ const OnboardingItem = ({item}) => {
 
 export default OnboardingItem;
 
+
+/* =====================================================
+   STYLES
+===================================================== */
+
 const styles = StyleSheet.create({
+
   container: {
-    width,
+    width: width,
+
     flex: 1,
+
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
+
+    justifyContent: 'flex-start',
+
+    paddingTop: Spacing.xxxl,
+
+    paddingHorizontal: Spacing.xxl,
   },
 
-  imageContainer: {
-    width: width * 0.78,
-    height: width * 0.78,
 
-    borderRadius: Radius.xxl,
+  /* ================================
+     IMAGE
+  ================================= */
 
+  circleBackdrop: {
+    width: CIRCLE_SIZE,
+
+    height: CIRCLE_SIZE,
+
+    borderRadius: CIRCLE_SIZE / 2,
+
+    // No light-green token exists in Colors yet —
+    // add e.g. Colors.primarySoft = '#E8F5E9' to
+    // colors.js to make this reusable instead of a
+    // one-off hex.
     backgroundColor: '#E8F5E9',
 
-    justifyContent: 'center',
     alignItems: 'center',
 
-    marginBottom: Spacing.xxl,
+    justifyContent: 'center',
   },
 
   image: {
-    width: '85%',
-    height: '85%',
+    width: '62%',
+
+    height: '62%',
   },
+
+
+  /* ================================
+     TEXT
+  ================================= */
 
   textContainer: {
     alignItems: 'center',
-    paddingHorizontal: Spacing.md,
+
+    marginTop: Spacing.xxl,
   },
 
   title: {
-    ...Typography.h2,
-
-    fontWeight: '800',
+    ...Typography.h3,
 
     color: Colors.text,
 
@@ -107,14 +128,17 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    ...Typography.body,
+    ...Typography.bodySmall,
+
+    marginTop: Spacing.sm,
 
     color: Colors.textSecondary,
 
     textAlign: 'center',
 
-    lineHeight: 24,
+    lineHeight: 20,
 
-    marginTop: Spacing.md,
+    maxWidth: width - 80,
   },
+
 });

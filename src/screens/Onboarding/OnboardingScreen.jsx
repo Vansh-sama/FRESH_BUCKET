@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  SafeAreaView,
+  Dimensions,
 } from 'react-native';
 
-import {SafeAreaView} from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OnboardingItem from '../../components/onboarding/OnboardingItem';
 import Pagination from '../../components/onboarding/Pagination';
@@ -22,7 +24,9 @@ import {
   Typography,
 } from '../../theme';
 
-const OnboardingScreen = ({onDone}) => {
+const {width} = Dimensions.get('window');
+
+const OnboardingScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const listRef = useRef(null);
@@ -30,31 +34,40 @@ const OnboardingScreen = ({onDone}) => {
   const isLastSlide =
     activeIndex === onboardingData.length - 1;
 
+
+  /* ================================
+     SCROLL
+  ================================= */
+
   const handleScroll = event => {
     const offsetX =
       event.nativeEvent.contentOffset.x;
 
-    const width =
-      event.nativeEvent.layoutMeasurement.width;
-
-    if (!width) {
-      return;
-    }
-
-    const index = Math.round(offsetX / width);
+    const index = Math.round(
+      offsetX / width,
+    );
 
     if (
+      index !== activeIndex &&
       index >= 0 &&
-      index < onboardingData.length &&
-      index !== activeIndex
+      index < onboardingData.length
     ) {
       setActiveIndex(index);
     }
   };
 
+
+  /* ================================
+     NEXT
+     Route name must match AppNavigator —
+     there is no 'Login' screen registered,
+     only 'Signup'.
+  ================================= */
+
   const handleNext = () => {
+
     if (isLastSlide) {
-      onDone?.();
+      navigation.replace('Signup');
       return;
     }
 
@@ -62,36 +75,55 @@ const OnboardingScreen = ({onDone}) => {
       index: activeIndex + 1,
       animated: true,
     });
+
   };
+
+
+  /* ================================
+     SKIP
+  ================================= */
 
   const handleSkip = () => {
-    onDone?.();
+    navigation.replace('Signup');
   };
 
-  return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'bottom']}>
 
-      {/* SKIP */}
+  return (
+    <SafeAreaView style={styles.container}>
+
+      {/* ================================
+          SKIP
+      ================================= */}
 
       {!isLastSlide && (
         <TouchableOpacity
           style={styles.skipButton}
-          onPress={handleSkip}
-          activeOpacity={0.7}>
+          activeOpacity={0.75}
+          onPress={handleSkip}>
 
           <Text style={styles.skipText}>
             Skip
           </Text>
 
+          <Ionicons
+            name="chevron-forward"
+            size={14}
+            color={Colors.primary}
+          />
+
         </TouchableOpacity>
       )}
 
-      {/* SLIDES */}
+
+      {/* ================================
+          SLIDES
+      ================================= */}
 
       <FlatList
         ref={listRef}
+
+        style={styles.flatList}
+
         data={onboardingData}
 
         renderItem={({item}) => (
@@ -101,25 +133,30 @@ const OnboardingScreen = ({onDone}) => {
         keyExtractor={item => item.id}
 
         horizontal
-        pagingEnabled
 
-        bounces={false}
+        pagingEnabled
 
         showsHorizontalScrollIndicator={false}
 
+        bounces={false}
+
         onScroll={handleScroll}
+
         scrollEventThrottle={16}
 
-        getItemLayout={(data, index) => ({
-          length: data?.length
-            ? undefined
-            : 0,
-          offset: 0,
+        decelerationRate="fast"
+
+        getItemLayout={(_, index) => ({
+          length: width,
+          offset: width * index,
           index,
         })}
       />
 
-      {/* BOTTOM */}
+
+      {/* ================================
+          BOTTOM
+      ================================= */}
 
       <View style={styles.bottomSection}>
 
@@ -141,23 +178,46 @@ const OnboardingScreen = ({onDone}) => {
 
 export default OnboardingScreen;
 
+
+/* =====================================================
+   STYLES
+===================================================== */
+
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
 
     backgroundColor: Colors.background,
   },
 
+
+  /* ================================
+     SKIP
+  ================================= */
+
   skipButton: {
     position: 'absolute',
 
-    top: 12,
-    right: 20,
+    top: Spacing.lg,
+
+    right: Spacing.lg,
 
     zIndex: 20,
 
-    paddingHorizontal: Spacing.md,
+    flexDirection: 'row',
+
+    alignItems: 'center',
+
+    paddingLeft: Spacing.md,
+
+    paddingRight: Spacing.sm,
+
     paddingVertical: Spacing.sm,
+
+    borderRadius: 20,
+
+    backgroundColor: '#E8F5E9',
   },
 
   skipText: {
@@ -166,11 +226,32 @@ const styles = StyleSheet.create({
     fontWeight: '700',
 
     color: Colors.primary,
+
+    marginRight: 2,
   },
+
+
+  /* ================================
+     SLIDES
+  ================================= */
+
+  flatList: {
+    flex: 1,
+  },
+
+
+  /* ================================
+     BOTTOM
+  ================================= */
 
   bottomSection: {
     backgroundColor: Colors.background,
 
-    paddingTop: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+
+    paddingTop: Spacing.xs,
+
+    paddingBottom: Spacing.md,
   },
+
 });
