@@ -1,9 +1,3 @@
-// navigation/MainStack.js
-// Wraps BottomTabs. Keep this as a stack (not directly rendering BottomTabs
-// in AppNavigator) so you can later push screens ON TOP of the tabs —
-// e.g. ProductDetail, Checkout, OrderTracking — without losing the tab bar
-// history underneath.
-
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -13,11 +7,40 @@ const Stack = createNativeStackNavigator();
 
 const MainStack = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Tabs" component={BottomTabs} />
-      {/* Later additions go here, e.g.: */}
-      {/* <Stack.Screen name="ProductDetail" component={ProductDetailScreen} /> */}
-      {/* <Stack.Screen name="Checkout" component={CheckoutScreen} /> */}
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+
+      <Stack.Screen
+        name="Tabs"
+        component={BottomTabs}
+      />
+
+      {/* Future screens */}
+
+      {/* 
+      <Stack.Screen
+        name="ProductDetails"
+        component={ProductDetailsScreen}
+      />
+
+      <Stack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+      />
+
+      <Stack.Screen
+        name="OrderDetails"
+        component={OrderDetailsScreen}
+      />
+
+      <Stack.Screen
+        name="OrderTracking"
+        component={OrderTrackingScreen}
+      />
+      */}
+
     </Stack.Navigator>
   );
 };

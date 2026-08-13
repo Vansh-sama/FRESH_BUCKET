@@ -1,156 +1,144 @@
 import React from 'react';
+
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  useWindowDimensions,
+  Dimensions,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import {
+  Colors,
+  Spacing,
+  Typography,
+} from '../../theme';
+
+const {width} = Dimensions.get('window');
+const CIRCLE_SIZE = width * 0.66;
 
 const OnboardingItem = ({item}) => {
-  const {width, height} = useWindowDimensions();
-
   return (
-    <View style={[styles.container, {width, height}]}>
-      {/* Top Illustration Section */}
-      <View style={styles.imageContainer}>
-        {/* Decorative Background */}
-        <View style={styles.bigCircle} />
-        <View style={styles.smallCircleLeft} />
-        <View style={styles.smallCircleRight} />
+    <View style={styles.container}>
+
+      {/* ================================
+          IMAGE CIRCLE
+      ================================= */}
+
+      <View style={styles.circleBackdrop}>
 
         <Image
           source={item.image}
-          resizeMode="contain"
           style={styles.image}
+          resizeMode="contain"
         />
 
-        {/* Brand icon badge — reuse this icon later on the matching app screen */}
-        <View style={styles.iconBadge}>
-          <Ionicons name={item.icon} size={22} color="#2E7D32" />
-        </View>
       </View>
 
-      {/* Bottom Content */}
-      <View style={styles.content}>
-        <Text style={styles.title}>{item.title}</Text>
+
+      {/* ================================
+          TEXT
+      ================================= */}
+
+      <View style={styles.textContainer}>
+
+        <Text style={styles.title}>
+          {item.title}
+        </Text>
 
         <Text style={styles.description}>
           {item.description}
         </Text>
+
       </View>
+
     </View>
   );
 };
 
 export default OnboardingItem;
 
+
+/* =====================================================
+   STYLES
+===================================================== */
+
 const styles = StyleSheet.create({
+
   container: {
+    width: width,
+
     flex: 1,
-    backgroundColor: '#F8F7F3',
+
+    alignItems: 'center',
+
+    justifyContent: 'flex-start',
+
+    paddingTop: Spacing.xxxl,
+
+    paddingHorizontal: Spacing.xxl,
   },
 
-  imageContainer: {
-    flex: 0.58,
-    justifyContent: 'center',
+
+  /* ================================
+     IMAGE
+  ================================= */
+
+  circleBackdrop: {
+    width: CIRCLE_SIZE,
+
+    height: CIRCLE_SIZE,
+
+    borderRadius: CIRCLE_SIZE / 2,
+
+    // No light-green token exists in Colors yet —
+    // add e.g. Colors.primarySoft = '#E8F5E9' to
+    // colors.js to make this reusable instead of a
+    // one-off hex.
+    backgroundColor: '#E8F5E9',
+
     alignItems: 'center',
-    overflow: 'hidden',
+
+    justifyContent: 'center',
   },
 
   image: {
-    width: '92%',
-    height: '92%',
-    zIndex: 5,
+    width: '62%',
+
+    height: '62%',
   },
 
-  iconBadge: {
-    position: 'absolute',
-    top: 40,
-    left: 28,
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 6,
 
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: {width: 0, height: 4},
-    elevation: 6,
-  },
+  /* ================================
+     TEXT
+  ================================= */
 
-  content: {
-    flex: 0.42,
-    backgroundColor: '#FFFFFF',
-
-    borderTopLeftRadius: 42,
-    borderTopRightRadius: 42,
-
+  textContainer: {
     alignItems: 'center',
 
-    paddingHorizontal: 32,
-    paddingTop: 28,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    shadowOffset: {
-      width: 0,
-      height: -5,
-    },
-
-    elevation: 12,
+    marginTop: Spacing.xxl,
   },
 
   title: {
-    fontSize: 25,
-    fontWeight: '800',
-    color: '#2E7D32',
+    ...Typography.h3,
+
+    color: Colors.text,
+
     textAlign: 'center',
-    lineHeight: 34,
   },
 
   description: {
-    marginTop: 18,
-    fontSize: 18,
-    color: '#5C6B60',
-    lineHeight: 29,
+    ...Typography.bodySmall,
+
+    marginTop: Spacing.sm,
+
+    color: Colors.textSecondary,
+
     textAlign: 'center',
-    paddingHorizontal: 12,
+
+    lineHeight: 20,
+
+    maxWidth: width - 80,
   },
 
-  bigCircle: {
-    position: 'absolute',
-    width: 360,
-    height: 360,
-    borderRadius: 180,
-    backgroundColor: 'rgba(46, 125, 50, 0.07)',
-    top: -60,
-    right: -80,
-  },
-
-  smallCircleLeft: {
-    position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: 'rgba(255, 179, 0, 0.08)',
-    left: -70,
-    top: 110,
-  },
-
-  smallCircleRight: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255, 107, 53, 0.08)',
-    bottom: 60,
-    right: 20,
-  },
 });

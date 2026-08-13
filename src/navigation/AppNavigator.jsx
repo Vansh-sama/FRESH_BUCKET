@@ -1,57 +1,43 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import SplashScreen from '../screens/Splash/SplashScreen';
 import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
-import AuthStack from './AuthStack';
+import SignupScreen from '../screens/Auth/SignupScreen';
 import MainStack from './MainStack';
 
 const Stack = createNativeStackNavigator();
 
-export default function AppNavigator() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFirstLaunch, setIsFirstLaunch] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
+const AppNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      {isLoading ? (
-        <Stack.Screen
-          name="Splash"
-          component={SplashScreen}
-        />
-      ) : isFirstLaunch ? (
-        <Stack.Screen name="Onboarding">
-          {props => (
-            <OnboardingScreen
-              {...props}
-              onDone={() => setIsFirstLaunch(false)}
-            />
-          )}
-        </Stack.Screen>
-      ) : !isLoggedIn ? (
-        <Stack.Screen name="Auth">
-          {props => (
-            <AuthStack
-              {...props}
-              onLoginSuccess={() => setIsLoggedIn(true)}
-            />
-          )}
-        </Stack.Screen>
-      ) : (
-        <Stack.Screen
-          name="Main"
-          component={MainStack}
-        />
-      )}
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{
+        headerShown: false,
+      }}>
+
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+      />
+
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+      />
+
+      <Stack.Screen
+        name="Signup"
+        component={SignupScreen}
+      />
+
+      <Stack.Screen
+        name="Main"
+        component={MainStack}
+      />
+
     </Stack.Navigator>
   );
-}
+};
+
+export default AppNavigator;

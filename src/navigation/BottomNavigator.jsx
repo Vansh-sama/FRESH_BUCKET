@@ -1,11 +1,13 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import HomeScreen from '../screens/Home/Home';
+import Ionicons from '@react-native-vector-icons/ionicons';
+
+import HomeScreen from '../screens/Home/HomeScreen';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+
 import {Colors} from '../theme';
 
 const Tab = createBottomTabNavigator();
@@ -15,9 +17,12 @@ const BottomTabs = () => {
     <Tab.Navigator
       screenOptions={({route}) => ({
         headerShown: false,
+
         tabBarShowLabel: true,
+
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textMuted,
+        tabBarInactiveTintColor: Colors.textLight,
+
         tabBarStyle: {
           height: 70,
           paddingBottom: 8,
@@ -28,33 +33,74 @@ const BottomTabs = () => {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
         },
+
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
         },
-        tabBarIcon: ({focused, color, size}) => {
+
+        tabBarIcon: ({focused, color}) => {
           let iconName;
+
           switch (route.name) {
             case 'Home':
-              iconName = focused ? 'home' : 'home-outline';
+              iconName = focused
+                ? 'home'
+                : 'home-outline';
               break;
+
             case 'Categories':
-              iconName = focused ? 'grid' : 'grid-outline';
+              iconName = focused
+                ? 'grid'
+                : 'grid-outline';
               break;
+
             case 'Cart':
-              iconName = focused ? 'cart' : 'cart-outline';
+              iconName = focused
+                ? 'cart'
+                : 'cart-outline';
               break;
+
             case 'Profile':
-              iconName = focused ? 'person' : 'person-outline';
+              iconName = focused
+                ? 'person'
+                : 'person-outline';
               break;
+
+            default:
+              iconName = 'ellipse-outline';
           }
-          return <Ionicons name={iconName} size={24} color={color} />;
+
+          return (
+            <Ionicons
+              name={iconName}
+              size={24}
+              color={color}
+            />
+          );
         },
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Categories" component={CategoriesScreen} />
-      <Tab.Screen name="Cart" component={CartScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+      />
+
+      <Tab.Screen
+        name="Categories"
+        component={CategoriesScreen}
+      />
+
+      <Tab.Screen
+        name="Cart"
+        component={CartScreen}
+      />
+
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+      />
+
     </Tab.Navigator>
   );
 };
