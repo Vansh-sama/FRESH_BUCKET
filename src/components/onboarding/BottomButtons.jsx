@@ -1,87 +1,91 @@
 import React from 'react';
+
 import {
+  View,
   TouchableOpacity,
   Text,
   StyleSheet,
-  View,
 } from 'react-native';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from '@react-native-vector-icons/ionicons';
 
-const BottomButtons = ({isLastSlide, onPress}) => {
+import {
+  Colors,
+  Typography,
+  Spacing,
+  Radius,
+} from '../../theme';
+
+const BottomButtons = ({
+  isLastSlide,
+  onPress,
+}) => {
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={onPress}
-      style={styles.button}>
+    <View style={styles.container}>
 
-      <Text style={styles.text}>
-        {isLastSlide ? 'Get Started' : 'Next'}
-      </Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={onPress}
+        activeOpacity={0.85}>
 
-      <View style={styles.iconContainer}>
+        <Text style={styles.buttonText}>
+          {isLastSlide ? 'Get Started' : 'Next'}
+        </Text>
+
         <Ionicons
-          name="arrow-forward"
-          size={22}
-          color="#FFFFFF"
+          name={
+            isLastSlide
+              ? 'checkmark'
+              : 'arrow-forward'
+          }
+          size={20}
+          color={Colors.white}
         />
-      </View>
 
-    </TouchableOpacity>
+      </TouchableOpacity>
+
+    </View>
   );
 };
 
 export default BottomButtons;
 
 const styles = StyleSheet.create({
+
+  container: {
+    width: '100%',
+    marginTop: Spacing.md,
+  },
+
   button: {
-    height: 62,
+    height: 56,
 
-    marginHorizontal: 24,
-    marginBottom: 30,
+    borderRadius: Radius.lg,
 
-    backgroundColor: '#2E7D32',
-
-    borderRadius: 32,
+    backgroundColor: Colors.primary,
 
     flexDirection: 'row',
-    justifyContent: 'center',
+
     alignItems: 'center',
 
-    shadowColor: '#2E7D32',
+    justifyContent: 'center',
+
+    gap: 8,
+
+    elevation: 4,
+
+    shadowColor: Colors.primary,
     shadowOffset: {
       width: 0,
-      height: 12,
+      height: 4,
     },
-    shadowOpacity: 0.28,
-    shadowRadius: 18,
-
-    elevation: 10,
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
 
-  text: {
-    color: '#FFFFFF',
-
-    fontSize: 18,
-
-    fontWeight: '700',
-
-    letterSpacing: 0.3,
+  buttonText: {
+    ...Typography.button,
+    color: Colors.white,
   },
 
-  iconContainer: {
-    position: 'absolute',
-
-    right: 20,
-
-    width: 36,
-    height: 36,
-
-    borderRadius: 18,
-
-    justifyContent: 'center',
-    alignItems: 'center',
-
-    backgroundColor: 'rgba(255,255,255,0.18)',
-  },
 });

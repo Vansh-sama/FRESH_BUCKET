@@ -1,17 +1,28 @@
 import React, {useRef, useState} from 'react';
+
 import {
   View,
   FlatList,
   TouchableOpacity,
   Text,
   StyleSheet,
+  SafeAreaView,
+  Dimensions,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import OnboardingItem from '../../components/onboarding/OnboardingItem';
 import Pagination from '../../components/onboarding/Pagination';
 import BottomButtons from '../../components/onboarding/BottomButtons';
+
 import {onboardingData} from '../../data/onboardingData';
+
+import {
+  Colors,
+  Spacing,
+  Typography,
+} from '../../theme';
+
+const {width} = Dimensions.get('window');
 
 const OnboardingScreen = ({onDone}) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -21,18 +32,37 @@ const OnboardingScreen = ({onDone}) => {
   const isLastSlide =
     activeIndex === onboardingData.length - 1;
 
+  /* =========================================
+     HANDLE SLIDE CHANGE
+  ========================================= */
+
   const handleScroll = event => {
+    const offsetX =
+      event.nativeEvent.contentOffset.x;
+
+    const screenWidth =
+      event.nativeEvent.layoutMeasurement.width;
+
     const index = Math.round(
-      event.nativeEvent.contentOffset.x /
-        event.nativeEvent.layoutMeasurement.width,
+      offsetX / screenWidth,
     );
 
-    setActiveIndex(index);
+    if (
+      index >= 0 &&
+      index < onboardingData.length &&
+      index !== activeIndex
+    ) {
+      setActiveIndex(index);
+    }
   };
+
+  /* =========================================
+     NEXT BUTTON
+  ========================================= */
 
   const handleNext = () => {
     if (isLastSlide) {
-      onDone && onDone();
+      onDone?.();
       return;
     }
 
@@ -42,44 +72,95 @@ const OnboardingScreen = ({onDone}) => {
     });
   };
 
+  /* =========================================
+     SKIP BUTTON
+  ========================================= */
+
   const handleSkip = () => {
+    const lastIndex =
+      onboardingData.length - 1;
+
     listRef.current?.scrollToIndex({
-      index: onboardingData.length - 1,
+      index: lastIndex,
       animated: true,
     });
 
-    setActiveIndex(onboardingData.length - 1);
+    setActiveIndex(lastIndex);
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+
+      {/* =====================================
+          SKIP BUTTON
+      ====================================== */}
+
       {!isLastSlide && (
         <TouchableOpacity
           style={styles.skipButton}
-          activeOpacity={0.85}
-          onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip</Text>
-          <Ionicons name="chevron-forward" size={16} color="#FF6B35" />
+          onPress={handleSkip}
+          activeOpacity={0.7}
+          hitSlop={{
+            top: 10,
+            bottom: 10,
+            left: 10,
+            right: 10,
+          }}>
+
+          <Text style={styles.skipText}>
+            Skip
+          </Text>
+
         </TouchableOpacity>
       )}
+
+      {/* =====================================
+          ONBOARDING SLIDES
+      ====================================== */}
 
       <FlatList
         ref={listRef}
         data={onboardingData}
+
         renderItem={({item}) => (
-          <OnboardingItem item={item} />
+          <View style={styles.slide}>
+            <OnboardingItem item={item} />
+          </View>
         )}
-        keyExtractor={item => item.id}
+
+        keyExtractor={item =>
+          item.id.toString()
+        }
+
         horizontal
         pagingEnabled
+
         bounces={false}
-        decelerationRate="fast"
-        initialNumToRender={3}
+
         showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScroll}
+
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+
+        // Makes the list behave correctly
+        // when moving directly to the last slide.
+        getItemLayout={(_, index) => ({
+          length: width,
+          offset: width * index,
+          index,
+        })}
+
+        initialNumToRender={1}
+        maxToRenderPerBatch={2}
+        windowSize={3}
       />
 
-      <View style={styles.bottomContainer}>
+      {/* =====================================
+          BOTTOM SECTION
+      ====================================== */}
+
+      <View style={styles.bottomSection}>
+
         <Pagination
           count={onboardingData.length}
           activeIndex={activeIndex}
@@ -89,49 +170,87 @@ const OnboardingScreen = ({onDone}) => {
           isLastSlide={isLastSlide}
           onPress={handleNext}
         />
+
       </View>
-    </View>
+
+    </SafeAreaView>
   );
 };
 
 export default OnboardingScreen;
 
+
+/* ===========================================
+   STYLES
+=========================================== */
+
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: '#F8F7F3',
+    backgroundColor: Colors.background,
   },
+
+  /* =========================================
+     SLIDE
+  ========================================= */
+
+  slide: {
+    width: width,
+    flex: 1,
+  },
+
+  /* =========================================
+     SKIP BUTTON
+  ========================================= */
 
   skipButton: {
     position: 'absolute',
-    top: 55,
-    right: 24,
-    zIndex: 10,
 
-    flexDirection: 'row',
-    alignItems: 'center',
+    top: 18,
+    right: 20,
 
-    paddingVertical: 8,
+    zIndex: 20,
+
     paddingHorizontal: 14,
-    borderRadius: 20,
+    paddingVertical: 9,
 
-    backgroundColor: 'rgba(255,255,255,0.85)',
+    borderRadius: 999,
+
+    backgroundColor: Colors.surface,
+
+    borderWidth: 1,
+    borderColor: Colors.border,
+
+    elevation: 2,
 
     shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: {width: 0, height: 2},
-    elevation: 4,
+    shadowRadius: 4,
   },
 
   skipText: {
-    fontSize: 15,
+    ...Typography.body,
+
     fontWeight: '600',
-    color: '#5C6B60',
-    marginRight: 2,
+
+    color: Colors.textSecondary,
   },
 
-  bottomContainer: {
-    paddingBottom: 35,
+  /* =========================================
+     BOTTOM SECTION
+  ========================================= */
+
+  bottomSection: {
+    paddingTop: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
+
+    backgroundColor: Colors.background,
   },
+
 });
