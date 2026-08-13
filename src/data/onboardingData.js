@@ -1,34 +1,36 @@
-export const onboardingData = [
+const onboardingData = [
   {
     id: '1',
 
-    title: 'Fresh Groceries\nDelivered Fast',
+    image: require('../assets/images/onboarding/grocery1.png'),
 
+    title: 'Fresh Groceries',
+    
     description:
-      'Choose from thousands of fresh fruits, vegetables and daily essentials.',
-
-    image: require('../assets/images/onboarding/grocery.png'),
+      'Shop fresh fruits, vegetables, dairy and everyday essentials from one place.',
   },
 
   {
     id: '2',
 
-    title: 'Lightning Fast\nDelivery',
+    image: require('../assets/images/onboarding/delivery.png'),
+
+    title: 'Fast Delivery',
 
     description:
-      'Your groceries arrive at your doorstep in just a few minutes.',
-
-    image: require('../assets/images/onboarding/delivery.png'),
+      'Get your groceries delivered quickly and conveniently right to your doorstep.',
   },
 
   {
     id: '3',
 
-    title: 'Track Every\nOrder',
+    image: require('../assets/images/onboarding/tracking.png'),
+
+    title: 'Track Your Order',
 
     description:
-      'Follow your order live and enjoy a seamless shopping experience.',
-
-    image: require('../assets/images/onboarding/tracking.png'),
+      'Stay updated with your order and know exactly when your groceries will arrive.',
   },
 ];
+
+export {onboardingData};

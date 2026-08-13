@@ -8,6 +8,7 @@ import {
 import {
   Colors,
   Spacing,
+  Radius,
 } from '../../theme';
 
 const Pagination = ({
@@ -16,7 +17,9 @@ const Pagination = ({
 }) => {
   return (
     <View style={styles.container}>
+
       {Array.from({length: count}).map((_, index) => (
+
         <View
           key={index}
           style={[
@@ -26,7 +29,9 @@ const Pagination = ({
               : styles.inactiveDot,
           ]}
         />
+
       ))}
+
     </View>
   );
 };
@@ -34,28 +39,32 @@ const Pagination = ({
 export default Pagination;
 
 const styles = StyleSheet.create({
-
   container: {
     flexDirection: 'row',
+
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+
+    marginBottom: Spacing.lg,
   },
 
   dot: {
     height: 7,
-    borderRadius: 10,
+
+    borderRadius: Radius.round,
+
     marginHorizontal: 4,
   },
 
   activeDot: {
     width: 24,
+
     backgroundColor: Colors.primary,
   },
 
   inactiveDot: {
     width: 7,
+
     backgroundColor: Colors.border,
   },
-
 });

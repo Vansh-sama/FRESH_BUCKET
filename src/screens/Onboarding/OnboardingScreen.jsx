@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  SafeAreaView,
-  Dimensions,
 } from 'react-native';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import OnboardingItem from '../../components/onboarding/OnboardingItem';
 import Pagination from '../../components/onboarding/Pagination';
@@ -22,8 +22,6 @@ import {
   Typography,
 } from '../../theme';
 
-const {width} = Dimensions.get('window');
-
 const OnboardingScreen = ({onDone}) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -32,20 +30,18 @@ const OnboardingScreen = ({onDone}) => {
   const isLastSlide =
     activeIndex === onboardingData.length - 1;
 
-  /* =========================================
-     HANDLE SLIDE CHANGE
-  ========================================= */
-
   const handleScroll = event => {
     const offsetX =
       event.nativeEvent.contentOffset.x;
 
-    const screenWidth =
+    const width =
       event.nativeEvent.layoutMeasurement.width;
 
-    const index = Math.round(
-      offsetX / screenWidth,
-    );
+    if (!width) {
+      return;
+    }
+
+    const index = Math.round(offsetX / width);
 
     if (
       index >= 0 &&
@@ -55,10 +51,6 @@ const OnboardingScreen = ({onDone}) => {
       setActiveIndex(index);
     }
   };
-
-  /* =========================================
-     NEXT BUTTON
-  ========================================= */
 
   const handleNext = () => {
     if (isLastSlide) {
@@ -72,40 +64,22 @@ const OnboardingScreen = ({onDone}) => {
     });
   };
 
-  /* =========================================
-     SKIP BUTTON
-  ========================================= */
-
   const handleSkip = () => {
-    const lastIndex =
-      onboardingData.length - 1;
-
-    listRef.current?.scrollToIndex({
-      index: lastIndex,
-      animated: true,
-    });
-
-    setActiveIndex(lastIndex);
+    onDone?.();
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={['top', 'bottom']}>
 
-      {/* =====================================
-          SKIP BUTTON
-      ====================================== */}
+      {/* SKIP */}
 
       {!isLastSlide && (
         <TouchableOpacity
           style={styles.skipButton}
           onPress={handleSkip}
-          activeOpacity={0.7}
-          hitSlop={{
-            top: 10,
-            bottom: 10,
-            left: 10,
-            right: 10,
-          }}>
+          activeOpacity={0.7}>
 
           <Text style={styles.skipText}>
             Skip
@@ -114,23 +88,17 @@ const OnboardingScreen = ({onDone}) => {
         </TouchableOpacity>
       )}
 
-      {/* =====================================
-          ONBOARDING SLIDES
-      ====================================== */}
+      {/* SLIDES */}
 
       <FlatList
         ref={listRef}
         data={onboardingData}
 
         renderItem={({item}) => (
-          <View style={styles.slide}>
-            <OnboardingItem item={item} />
-          </View>
+          <OnboardingItem item={item} />
         )}
 
-        keyExtractor={item =>
-          item.id.toString()
-        }
+        keyExtractor={item => item.id}
 
         horizontal
         pagingEnabled
@@ -142,22 +110,16 @@ const OnboardingScreen = ({onDone}) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
 
-        // Makes the list behave correctly
-        // when moving directly to the last slide.
-        getItemLayout={(_, index) => ({
-          length: width,
-          offset: width * index,
+        getItemLayout={(data, index) => ({
+          length: data?.length
+            ? undefined
+            : 0,
+          offset: 0,
           index,
         })}
-
-        initialNumToRender={1}
-        maxToRenderPerBatch={2}
-        windowSize={3}
       />
 
-      {/* =====================================
-          BOTTOM SECTION
-      ====================================== */}
+      {/* BOTTOM */}
 
       <View style={styles.bottomSection}>
 
@@ -179,78 +141,36 @@ const OnboardingScreen = ({onDone}) => {
 
 export default OnboardingScreen;
 
-
-/* ===========================================
-   STYLES
-=========================================== */
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
+
     backgroundColor: Colors.background,
   },
-
-  /* =========================================
-     SLIDE
-  ========================================= */
-
-  slide: {
-    width: width,
-    flex: 1,
-  },
-
-  /* =========================================
-     SKIP BUTTON
-  ========================================= */
 
   skipButton: {
     position: 'absolute',
 
-    top: 18,
+    top: 12,
     right: 20,
 
     zIndex: 20,
 
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-
-    borderRadius: 999,
-
-    backgroundColor: Colors.surface,
-
-    borderWidth: 1,
-    borderColor: Colors.border,
-
-    elevation: 2,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
   },
 
   skipText: {
-    ...Typography.body,
+    ...Typography.bodySmall,
 
-    fontWeight: '600',
+    fontWeight: '700',
 
-    color: Colors.textSecondary,
+    color: Colors.primary,
   },
-
-  /* =========================================
-     BOTTOM SECTION
-  ========================================= */
 
   bottomSection: {
-    paddingTop: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-
     backgroundColor: Colors.background,
-  },
 
+    paddingTop: Spacing.sm,
+  },
 });

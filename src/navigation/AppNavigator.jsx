@@ -11,20 +11,31 @@ const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFirstLaunch, setIsFirstLaunch] = useState(true);
+  const [isSignedUp, setIsSignedUp] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 4000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+
+      {/* SPLASH */}
       {isLoading ? (
-        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen
+          name="Splash"
+          component={SplashScreen}
+        />
       ) : isFirstLaunch ? (
+
+        /* ONBOARDING */
         <Stack.Screen name="Onboarding">
           {props => (
             <OnboardingScreen
@@ -33,12 +44,29 @@ export default function AppNavigator() {
             />
           )}
         </Stack.Screen>
+
+      ) : !isSignedUp ? (
+
+        /* SIGNUP */
+        <Stack.Screen name="Signup">
+          {props => (
+            <SignupScreen
+              {...props}
+              onSignupSuccess={() => setIsSignedUp(true)}
+            />
+          )}
+        </Stack.Screen>
+
       ) : (
-        <Stack.Screen name="Signup" component={SignupScreen} />
+
+        /* MAIN APP */
+        <Stack.Screen
+          name="Main"
+          component={MainStack}
+        />
+
       )}
 
-      {/* Main application */}
-      <Stack.Screen name="Main" component={MainStack} />
     </Stack.Navigator>
   );
 }

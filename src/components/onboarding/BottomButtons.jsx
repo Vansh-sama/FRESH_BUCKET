@@ -2,18 +2,18 @@ import React from 'react';
 
 import {
   View,
-  TouchableOpacity,
   Text,
+  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
-import Ionicons from '@react-native-vector-icons/ionicons';
+import Ionicons from '@react-native-vector-icons/ionicons/static';
 
 import {
   Colors,
   Typography,
-  Spacing,
   Radius,
+  Spacing,
 } from '../../theme';
 
 const BottomButtons = ({
@@ -25,11 +25,13 @@ const BottomButtons = ({
 
       <TouchableOpacity
         style={styles.button}
-        onPress={onPress}
-        activeOpacity={0.85}>
+        activeOpacity={0.85}
+        onPress={onPress}>
 
         <Text style={styles.buttonText}>
-          {isLastSlide ? 'Get Started' : 'Next'}
+          {isLastSlide
+            ? 'Get Started'
+            : 'Next'}
         </Text>
 
         <Ionicons
@@ -51,41 +53,31 @@ const BottomButtons = ({
 export default BottomButtons;
 
 const styles = StyleSheet.create({
-
   container: {
-    width: '100%',
-    marginTop: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    paddingBottom: Spacing.lg,
   },
 
   button: {
     height: 56,
 
-    borderRadius: Radius.lg,
+    borderRadius: Radius.md,
 
     backgroundColor: Colors.primary,
 
     flexDirection: 'row',
 
     alignItems: 'center',
-
     justifyContent: 'center',
 
-    gap: 8,
-
     elevation: 4,
-
-    shadowColor: Colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
   },
 
   buttonText: {
     ...Typography.button,
-    color: Colors.white,
-  },
 
+    color: Colors.white,
+
+    marginRight: Spacing.sm,
+  },
 });

@@ -8,6 +8,8 @@ import {
   Dimensions,
 } from 'react-native';
 
+import Ionicons from '@react-native-vector-icons/ionicons/static';
+
 import {
   Colors,
   Typography,
@@ -21,17 +23,23 @@ const OnboardingItem = ({item}) => {
   return (
     <View style={styles.container}>
 
-      {/* IMAGE */}
+      {/* IMAGE / ICON */}
 
       <View style={styles.imageContainer}>
 
-        <View style={styles.imageBackground}>
+        {item.image ? (
           <Image
             source={item.image}
             style={styles.image}
             resizeMode="contain"
           />
-        </View>
+        ) : (
+          <Ionicons
+            name={item.icon || 'basket-outline'}
+            size={100}
+            color={Colors.primary}
+          />
+        )}
 
       </View>
 
@@ -56,7 +64,6 @@ const OnboardingItem = ({item}) => {
 export default OnboardingItem;
 
 const styles = StyleSheet.create({
-
   container: {
     width,
     flex: 1,
@@ -66,52 +73,37 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: -30,
-  },
-
-  imageBackground: {
     width: width * 0.78,
     height: width * 0.78,
 
     borderRadius: Radius.xxl,
 
-    backgroundColor: Colors.surface,
+    backgroundColor: '#E8F5E9',
 
     justifyContent: 'center',
     alignItems: 'center',
 
-    elevation: 3,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
+    marginBottom: Spacing.xxl,
   },
 
   image: {
-    width: '88%',
-    height: '88%',
+    width: '85%',
+    height: '85%',
   },
 
   textContainer: {
-    width: '100%',
     alignItems: 'center',
-    marginTop: Spacing.xxl,
+    paddingHorizontal: Spacing.md,
   },
 
   title: {
     ...Typography.h2,
 
+    fontWeight: '800',
+
     color: Colors.text,
 
     textAlign: 'center',
-
-    lineHeight: 34,
   },
 
   description: {
@@ -124,8 +116,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
 
     marginTop: Spacing.md,
-
-    paddingHorizontal: Spacing.md,
   },
-
 });

@@ -12,7 +12,9 @@ import {
   StatusBar,
 } from 'react-native';
 
-import Ionicons from '@react-native-vector-icons/ionicons';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
+import Ionicons from '@react-native-vector-icons/ionicons/static';
 
 import {
   Colors,
@@ -21,7 +23,7 @@ import {
   Radius,
 } from '../../theme';
 
-const SignupScreen = ({navigation}) => {
+const SignupScreen = ({navigation, onSignupSuccess}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,17 +33,6 @@ const SignupScreen = ({navigation}) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [error, setError] = useState('');
-
-  /*
-   * For now we are not connecting authentication.
-   *
-   * Later:
-   * Signup/Login will be replaced with Phone Number + OTP.
-   */
-
-  const goToHome = () => {
-    navigation.replace('Main');
-  };
 
   const handleSignup = () => {
     if (
@@ -61,418 +52,378 @@ const SignupScreen = ({navigation}) => {
 
     setError('');
 
-    // Temporary navigation until Phone + OTP is implemented.
-    goToHome();
+    onSignupSuccess?.();
   };
 
   const handleGoogleSignup = () => {
-    // Google authentication will be added later.
-    goToHome();
+    onSignupSuccess?.();
   };
 
   const handleAppleSignup = () => {
-    // Apple authentication will be added later.
-    goToHome();
+    onSignupSuccess?.();
   };
 
   const handleSkip = () => {
-    // Skip signup and continue to the main application.
-    goToHome();
+    onSignupSuccess?.();
   };
 
   return (
-    <KeyboardAvoidingView
+    <SafeAreaView
       style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      edges={['top', 'bottom']}>
 
       <StatusBar
         barStyle="dark-content"
         backgroundColor={Colors.background}
       />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.scrollContent}>
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : undefined
+        }>
 
-        {/* =====================================================
-            TOP BAR
-        ====================================================== */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}>
 
-        <View style={styles.topBar}>
+          {/* TOP BAR */}
 
-          {/* BACK BUTTON */}
-
-          <TouchableOpacity
-            style={styles.backButton}
-            activeOpacity={0.8}
-            onPress={() => navigation.goBack()}>
-
-            <Ionicons
-              name="arrow-back"
-              size={22}
-              color={Colors.text}
-            />
-
-          </TouchableOpacity>
-
-
-          {/* SKIP BUTTON */}
-
-          <TouchableOpacity
-            style={styles.skipButton}
-            activeOpacity={0.8}
-            onPress={handleSkip}>
-
-            <Text style={styles.skipText}>
-              Skip
-            </Text>
-
-            <Ionicons
-              name="arrow-forward"
-              size={16}
-              color={Colors.primary}
-            />
-
-          </TouchableOpacity>
-
-        </View>
-
-
-        {/* =====================================================
-            HEADER
-        ====================================================== */}
-
-        <View style={styles.header}>
-
-          <View style={styles.logoContainer}>
-
-            <Ionicons
-              name="basket-outline"
-              size={38}
-              color={Colors.primary}
-            />
-
-          </View>
-
-
-          <Text style={styles.title}>
-            Welcome to Fresh Basket
-          </Text>
-
-
-          <Text style={styles.subtitle}>
-            Create your account and get fresh groceries
-            delivered right to your doorstep.
-          </Text>
-
-        </View>
-
-
-        {/* =====================================================
-            FORM
-        ====================================================== */}
-
-        <View style={styles.formCard}>
-
-          {/* NAME */}
-
-          <View style={styles.inputContainer}>
-
-            <Ionicons
-              name="person-outline"
-              size={20}
-              color={Colors.textSecondary}
-              style={styles.inputIcon}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Full name"
-              placeholderTextColor={Colors.textLight}
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
-
-          </View>
-
-
-          {/* EMAIL */}
-
-          <View style={styles.inputContainer}>
-
-            <Ionicons
-              name="mail-outline"
-              size={20}
-              color={Colors.textSecondary}
-              style={styles.inputIcon}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Email address"
-              placeholderTextColor={Colors.textLight}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-
-          </View>
-
-
-          {/* PASSWORD */}
-
-          <View style={styles.inputContainer}>
-
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color={Colors.textSecondary}
-              style={styles.inputIcon}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor={Colors.textLight}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
-
+          <View style={styles.topBar}>
 
             <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() =>
-                setShowPassword(previous => !previous)
-              }>
+              style={styles.backButton}
+              activeOpacity={0.8}
+              onPress={() => navigation.goBack()}>
 
               <Ionicons
-                name={
-                  showPassword
-                    ? 'eye-off-outline'
-                    : 'eye-outline'
-                }
-                size={21}
-                color={Colors.textSecondary}
+                name="arrow-back"
+                size={22}
+                color={Colors.text}
               />
 
             </TouchableOpacity>
 
-          </View>
-
-
-          {/* CONFIRM PASSWORD */}
-
-          <View style={styles.inputContainer}>
-
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={20}
-              color={Colors.textSecondary}
-              style={styles.inputIcon}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm password"
-              placeholderTextColor={Colors.textLight}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showConfirmPassword}
-              autoCapitalize="none"
-            />
-
-
             <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() =>
-                setShowConfirmPassword(previous => !previous)
-              }>
+              style={styles.skipButton}
+              activeOpacity={0.8}
+              onPress={handleSkip}>
 
-              <Ionicons
-                name={
-                  showConfirmPassword
-                    ? 'eye-off-outline'
-                    : 'eye-outline'
-                }
-                size={21}
-                color={Colors.textSecondary}
-              />
-
-            </TouchableOpacity>
-
-          </View>
-
-
-          {/* ERROR */}
-
-          {error ? (
-            <View style={styles.errorContainer}>
-
-              <Ionicons
-                name="alert-circle-outline"
-                size={17}
-                color={Colors.error}
-              />
-
-              <Text style={styles.errorText}>
-                {error}
+              <Text style={styles.skipText}>
+                Skip
               </Text>
 
+              <Ionicons
+                name="arrow-forward"
+                size={16}
+                color={Colors.primary}
+              />
+
+            </TouchableOpacity>
+
+          </View>
+
+          {/* HEADER */}
+
+          <View style={styles.header}>
+
+            <View style={styles.logoContainer}>
+
+              <Ionicons
+                name="basket-outline"
+                size={38}
+                color={Colors.primary}
+              />
+
             </View>
-          ) : null}
 
-
-          {/* CREATE ACCOUNT */}
-
-          <TouchableOpacity
-            style={styles.primaryButton}
-            activeOpacity={0.85}
-            onPress={handleSignup}>
-
-            <Text style={styles.primaryButtonText}>
-              Create Account
+            <Text style={styles.title}>
+              Welcome to Fresh Basket
             </Text>
 
-            <Ionicons
-              name="arrow-forward"
-              size={19}
-              color={Colors.white}
-            />
-
-          </TouchableOpacity>
-
-        </View>
-
-
-        {/* =====================================================
-            DIVIDER
-        ====================================================== */}
-
-        <View style={styles.dividerContainer}>
-
-          <View style={styles.divider} />
-
-          <Text style={styles.dividerText}>
-            OR CONTINUE WITH
-          </Text>
-
-          <View style={styles.divider} />
-
-        </View>
-
-
-        {/* =====================================================
-            SOCIAL BUTTONS
-        ====================================================== */}
-
-        <View style={styles.socialContainer}>
-
-          {/* GOOGLE */}
-
-          <TouchableOpacity
-            style={styles.socialButton}
-            activeOpacity={0.85}
-            onPress={handleGoogleSignup}>
-
-            <Ionicons
-              name="logo-google"
-              size={20}
-              color="#DB4437"
-            />
-
-            <Text style={styles.socialText}>
-              Google
+            <Text style={styles.subtitle}>
+              Create your account and get fresh groceries
+              delivered right to your doorstep.
             </Text>
 
-          </TouchableOpacity>
+          </View>
 
+          {/* FORM */}
 
-          {/* APPLE */}
+          <View style={styles.formCard}>
 
-          <TouchableOpacity
-            style={[
-              styles.socialButton,
-              styles.appleButton,
-            ]}
-            activeOpacity={0.85}
-            onPress={handleAppleSignup}>
+            {/* NAME */}
 
-            <Ionicons
-              name="logo-apple"
-              size={21}
-              color={Colors.white}
-            />
+            <View style={styles.inputContainer}>
 
-            <Text
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color={Colors.textSecondary}
+                style={styles.inputIcon}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Full name"
+                placeholderTextColor={Colors.textLight}
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+              />
+
+            </View>
+
+            {/* EMAIL */}
+
+            <View style={styles.inputContainer}>
+
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color={Colors.textSecondary}
+                style={styles.inputIcon}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Email address"
+                placeholderTextColor={Colors.textLight}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+
+            </View>
+
+            {/* PASSWORD */}
+
+            <View style={styles.inputContainer}>
+
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color={Colors.textSecondary}
+                style={styles.inputIcon}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor={Colors.textLight}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() =>
+                  setShowPassword(previous => !previous)
+                }>
+
+                <Ionicons
+                  name={
+                    showPassword
+                      ? 'eye-off-outline'
+                      : 'eye-outline'
+                  }
+                  size={21}
+                  color={Colors.textSecondary}
+                />
+
+              </TouchableOpacity>
+
+            </View>
+
+            {/* CONFIRM PASSWORD */}
+
+            <View style={styles.inputContainer}>
+
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={20}
+                color={Colors.textSecondary}
+                style={styles.inputIcon}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm password"
+                placeholderTextColor={Colors.textLight}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+                autoCapitalize="none"
+              />
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() =>
+                  setShowConfirmPassword(previous => !previous)
+                }>
+
+                <Ionicons
+                  name={
+                    showConfirmPassword
+                      ? 'eye-off-outline'
+                      : 'eye-outline'
+                  }
+                  size={21}
+                  color={Colors.textSecondary}
+                />
+
+              </TouchableOpacity>
+
+            </View>
+
+            {/* ERROR */}
+
+            {error ? (
+              <View style={styles.errorContainer}>
+
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={17}
+                  color={Colors.error}
+                />
+
+                <Text style={styles.errorText}>
+                  {error}
+                </Text>
+
+              </View>
+            ) : null}
+
+            {/* CREATE ACCOUNT */}
+
+            <TouchableOpacity
+              style={styles.primaryButton}
+              activeOpacity={0.85}
+              onPress={handleSignup}>
+
+              <Text style={styles.primaryButtonText}>
+                Create Account
+              </Text>
+
+              <Ionicons
+                name="arrow-forward"
+                size={19}
+                color={Colors.white}
+              />
+
+            </TouchableOpacity>
+
+          </View>
+
+          {/* DIVIDER */}
+
+          <View style={styles.dividerContainer}>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.dividerText}>
+              OR CONTINUE WITH
+            </Text>
+
+            <View style={styles.divider} />
+
+          </View>
+
+          {/* SOCIAL BUTTONS */}
+
+          <View style={styles.socialContainer}>
+
+            <TouchableOpacity
+              style={styles.socialButton}
+              activeOpacity={0.85}
+              onPress={handleGoogleSignup}>
+
+              <Ionicons
+                name="logo-google"
+                size={20}
+                color="#DB4437"
+              />
+
+              <Text style={styles.socialText}>
+                Google
+              </Text>
+
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={[
-                styles.socialText,
-                styles.appleText,
-              ]}>
+                styles.socialButton,
+                styles.appleButton,
+              ]}
+              activeOpacity={0.85}
+              onPress={handleAppleSignup}>
 
-              Apple
+              <Ionicons
+                name="logo-apple"
+                size={21}
+                color={Colors.white}
+              />
 
+              <Text
+                style={[
+                  styles.socialText,
+                  styles.appleText,
+                ]}>
+                Apple
+              </Text>
+
+            </TouchableOpacity>
+
+          </View>
+
+          {/* FUTURE OTP */}
+
+          <View style={styles.otpComingSoon}>
+
+            <Ionicons
+              name="phone-portrait-outline"
+              size={15}
+              color={Colors.primary}
+            />
+
+            <Text style={styles.otpText}>
+              Phone number + OTP login coming soon
             </Text>
 
-          </TouchableOpacity>
+          </View>
 
-        </View>
+          {/* FOOTER */}
 
+          <View style={styles.footer}>
 
-        {/* =====================================================
-            FUTURE AUTH MESSAGE
-        ====================================================== */}
+            <Ionicons
+              name="leaf-outline"
+              size={14}
+              color={Colors.primary}
+            />
 
-        <View style={styles.futureAuthContainer}>
+            <Text style={styles.footerText}>
+              Fresh groceries. Simple shopping.
+            </Text>
 
-          <Ionicons
-            name="phone-portrait-outline"
-            size={16}
-            color={Colors.primary}
-          />
+          </View>
 
-          <Text style={styles.futureAuthText}>
-            Phone number + OTP login coming soon
-          </Text>
+        </ScrollView>
 
-        </View>
+      </KeyboardAvoidingView>
 
-
-        {/* =====================================================
-            FOOTER
-        ====================================================== */}
-
-        <View style={styles.footer}>
-
-          <Ionicons
-            name="leaf-outline"
-            size={14}
-            color={Colors.primary}
-          />
-
-          <Text style={styles.footerText}>
-            Fresh groceries. Simple shopping.
-          </Text>
-
-        </View>
-
-      </ScrollView>
-
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 export default SignupScreen;
-
-
-/* ============================================================
-   STYLES
-============================================================ */
 
 const styles = StyleSheet.create({
 
@@ -481,26 +432,25 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
+  keyboardContainer: {
+    flex: 1,
+  },
 
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.xxxl,
+    paddingBottom: 30,
   },
 
-
-  /* ============================================================
-     TOP BAR
-  ============================================================ */
+  /* TOP */
 
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
     marginBottom: Spacing.lg,
   },
-
 
   backButton: {
     width: 42,
@@ -513,7 +463,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-
   skipButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -523,7 +472,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
 
-
   skipText: {
     ...Typography.bodySmall,
     fontWeight: '700',
@@ -531,17 +479,13 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-
-  /* ============================================================
-     HEADER
-  ============================================================ */
+  /* HEADER */
 
   header: {
     alignItems: 'center',
     marginTop: Spacing.sm,
     marginBottom: Spacing.xl,
   },
-
 
   logoContainer: {
     width: 78,
@@ -553,27 +497,23 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
 
-
   title: {
     ...Typography.h2,
+    fontWeight: '800',
     color: Colors.text,
     textAlign: 'center',
   },
 
-
   subtitle: {
     ...Typography.bodySmall,
+    marginTop: Spacing.sm,
     lineHeight: 22,
     color: Colors.textSecondary,
     textAlign: 'center',
-    paddingHorizontal: Spacing.md,
-    marginTop: Spacing.sm,
+    paddingHorizontal: 15,
   },
 
-
-  /* ============================================================
-     FORM
-  ============================================================ */
+  /* FORM */
 
   formCard: {
     backgroundColor: Colors.surface,
@@ -582,7 +522,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-
 
   inputContainer: {
     height: 54,
@@ -596,39 +535,29 @@ const styles = StyleSheet.create({
     marginBottom: 13,
   },
 
-
   inputIcon: {
     marginRight: 11,
   },
-
 
   input: {
     flex: 1,
     height: '100%',
     ...Typography.bodySmall,
     color: Colors.text,
-    paddingVertical: 0,
   },
-
 
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: 12,
     paddingHorizontal: 3,
   },
 
-
   errorText: {
-    marginLeft: 6,
     ...Typography.caption,
+    marginLeft: 6,
     color: Colors.error,
   },
-
-
-  /* ============================================================
-     PRIMARY BUTTON
-  ============================================================ */
 
   primaryButton: {
     height: 55,
@@ -648,17 +577,14 @@ const styles = StyleSheet.create({
     shadowRadius: 7,
   },
 
-
   primaryButtonText: {
     ...Typography.button,
+    fontWeight: '800',
     color: Colors.white,
-    marginRight: Spacing.sm,
+    marginRight: 9,
   },
 
-
-  /* ============================================================
-     DIVIDER
-  ============================================================ */
+  /* DIVIDER */
 
   dividerContainer: {
     flexDirection: 'row',
@@ -666,31 +592,25 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.xl,
   },
 
-
   divider: {
     flex: 1,
     height: 1,
     backgroundColor: Colors.border,
   },
 
-
   dividerText: {
-    marginHorizontal: Spacing.sm,
+    marginHorizontal: 10,
     ...Typography.tiny,
     fontWeight: '700',
     letterSpacing: 0.8,
     color: Colors.textLight,
   },
 
-
-  /* ============================================================
-     SOCIAL BUTTONS
-  ============================================================ */
+  /* SOCIAL */
 
   socialContainer: {
     flexDirection: 'row',
   },
-
 
   socialButton: {
     flex: 1,
@@ -705,48 +625,38 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
 
-
   appleButton: {
     backgroundColor: '#111111',
     borderColor: '#111111',
   },
 
-
   socialText: {
     ...Typography.bodySmall,
     fontWeight: '700',
     color: Colors.text,
-    marginLeft: Spacing.sm,
+    marginLeft: 8,
   },
-
 
   appleText: {
     color: Colors.white,
   },
 
+  /* OTP */
 
-  /* ============================================================
-     FUTURE AUTH
-  ============================================================ */
-
-  futureAuthContainer: {
+  otpComingSoon: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     marginTop: Spacing.xl,
   },
 
-
-  futureAuthText: {
+  otpText: {
     ...Typography.caption,
     color: Colors.textSecondary,
-    marginLeft: 6,
+    marginLeft: 5,
   },
 
-
-  /* ============================================================
-     FOOTER
-  ============================================================ */
+  /* FOOTER */
 
   footer: {
     flexDirection: 'row',
@@ -755,11 +665,10 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xl,
   },
 
-
   footerText: {
     ...Typography.caption,
-    color: Colors.textLight,
     marginLeft: 5,
+    color: Colors.textLight,
   },
 
 });
