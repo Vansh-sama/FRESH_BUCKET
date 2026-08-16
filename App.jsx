@@ -1,12 +1,13 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 
-import AppNavigator from './src/navigation/AppNavigator';
+import redux from './src/screens/ReduxApiScreen';
+import ReduxApiScreen from './src/screens/ReduxApiScreen';
 
 export default function App() {
   return (
     <NavigationContainer>
-      <AppNavigator />
+      <ReduxApiScreen>
     </NavigationContainer>
   );
 }
