@@ -1,4 +1,7 @@
-import React, {useEffect, useRef} from 'react';
+import React, {
+  useEffect,
+  useRef,
+} from 'react';
 
 import {
   View,
@@ -8,136 +11,279 @@ import {
   Animated,
   Easing,
   StatusBar,
+  Dimensions,
 } from 'react-native';
 
-import LinearGradient from 'react-native-linear-gradient';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+
+import Ionicons from '@react-native-vector-icons/ionicons';
 
 import {
   Colors,
-  Spacing,
   Typography,
-  Radius,
 } from '../../theme';
 
+const {width} = Dimensions.get('window');
+
+const SPLASH_DURATION = 7000;
+
+const LOGO_CIRCLE = 190;
+
 const SplashScreen = ({navigation}) => {
-  const logoScale = useRef(new Animated.Value(0.82)).current;
+
+  const insets = useSafeAreaInsets();
+
+  const logoScale = useRef(new Animated.Value(0.85)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
-
-  const contentOpacity = useRef(new Animated.Value(0)).current;
-  const contentTranslate = useRef(new Animated.Value(18)).current;
-
-  const loaderOpacity = useRef(new Animated.Value(0)).current;
-  const spinnerRotation = useRef(new Animated.Value(0)).current;
+  const ringScale = useRef(new Animated.Value(1)).current;
+  const ringOpacity = useRef(new Animated.Value(0.5)).current;
+  const breathe = useRef(new Animated.Value(0)).current;
+  const textOpacity = useRef(new Animated.Value(0)).current;
+  const textTranslate = useRef(new Animated.Value(10)).current;
+  const taglineOpacity = useRef(new Animated.Value(0)).current;
+  const blobOneFloat = useRef(new Animated.Value(0)).current;
+  const blobTwoFloat = useRef(new Animated.Value(0)).current;
+  const progressWidth = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(logoScale, {
-        toValue: 1,
-        duration: 800,
-        easing: Easing.out(Easing.back(1.1)),
-        useNativeDriver: true,
-      }),
 
+    // Logo entrance
+    Animated.parallel([
       Animated.timing(logoOpacity, {
         toValue: 1,
-        duration: 650,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(logoScale, {
+        toValue: 1,
+        friction: 7,
+        tension: 45,
         useNativeDriver: true,
       }),
     ]).start();
 
+    // Text entrance
     Animated.parallel([
-      Animated.timing(contentOpacity, {
+      Animated.timing(textOpacity, {
         toValue: 1,
-        duration: 650,
-        delay: 400,
+        duration: 500,
+        delay: 350,
         useNativeDriver: true,
       }),
-
-      Animated.timing(contentTranslate, {
+      Animated.timing(textTranslate, {
         toValue: 0,
-        duration: 650,
-        delay: 400,
+        duration: 500,
+        delay: 350,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
     ]).start();
 
-    Animated.timing(loaderOpacity, {
+    // Tagline row fade-in, slightly after title
+    Animated.timing(taglineOpacity, {
       toValue: 1,
-      duration: 400,
-      delay: 900,
+      duration: 500,
+      delay: 650,
       useNativeDriver: true,
     }).start();
 
-    // Continuous spinner rotation
+    // Pulsing ring behind logo — loops for the whole splash duration
     Animated.loop(
-      Animated.timing(spinnerRotation, {
-        toValue: 1,
-        duration: 900,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(ringScale, {
+            toValue: 1.3,
+            duration: 1400,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(ringScale, {
+            toValue: 1,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(ringOpacity, {
+            toValue: 0,
+            duration: 1400,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(ringOpacity, {
+            toValue: 0.5,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
     ).start();
+
+    // Subtle breathing scale on the logo itself — same idea as the
+    // onboarding illustration, keeps it feeling alive over 7s.
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(breathe, {
+          toValue: 1,
+          duration: 1800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(breathe, {
+          toValue: 0,
+          duration: 1800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    // Floating background blobs — slow, subtle vertical drift
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blobOneFloat, {
+          toValue: 1,
+          duration: 2600,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(blobOneFloat, {
+          toValue: 0,
+          duration: 2600,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blobTwoFloat, {
+          toValue: 1,
+          duration: 3200,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(blobTwoFloat, {
+          toValue: 0,
+          duration: 3200,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    // Progress bar — fills over the full splash duration
+    Animated.timing(progressWidth, {
+      toValue: 1,
+      duration: SPLASH_DURATION,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start();
 
     const timer = setTimeout(() => {
       navigation.replace('Onboarding');
-    }, 3500);
+    }, SPLASH_DURATION);
 
     return () => clearTimeout(timer);
+
   }, [
     navigation,
     logoScale,
     logoOpacity,
-    contentOpacity,
-    contentTranslate,
-    loaderOpacity,
-    spinnerRotation,
+    ringScale,
+    ringOpacity,
+    breathe,
+    textOpacity,
+    textTranslate,
+    taglineOpacity,
+    blobOneFloat,
+    blobTwoFloat,
+    progressWidth,
   ]);
 
-  const spinnerSpin = spinnerRotation.interpolate({
+  const blobOneTranslateY = blobOneFloat.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: [0, -18],
+  });
+
+  const blobTwoTranslateY = blobTwoFloat.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 16],
+  });
+
+  const progressBarWidth = progressWidth.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
+
+  const breatheScale = breathe.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.035],
   });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
 
       <StatusBar
-        backgroundColor={Colors.primaryDark}
-        barStyle="light-content"
+        barStyle="dark-content"
+        backgroundColor={Colors.onboardingBg}
       />
 
-      <LinearGradient
-        colors={[
-          Colors.primaryDark,
-          Colors.primary,
-          Colors.primaryLight,
+      {/* BACKGROUND DECORATION — floating blobs, more presence than a flat bg */}
+      <Animated.View
+        style={[
+          styles.blob,
+          styles.blobOne,
+          {transform: [{translateY: blobOneTranslateY}]},
         ]}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 1}}
-        style={StyleSheet.absoluteFill}
       />
-
-      {/* BACKGROUND DECORATION */}
-
-      <View style={styles.circleTop} />
-      <View style={styles.circleBottom} />
-      <View style={styles.circleSmall} />
-
-      {/* MAIN CONTENT */}
+      <Animated.View
+        style={[
+          styles.blob,
+          styles.blobTwo,
+          {transform: [{translateY: blobTwoTranslateY}]},
+        ]}
+      />
+      <View style={[styles.blob, styles.blobThree]} />
+      <View style={[styles.blob, styles.blobFour]} />
 
       <View style={styles.content}>
 
-        <Animated.View
-          style={[
-            styles.logoWrapper,
-            {
-              opacity: logoOpacity,
-              transform: [{scale: logoScale}],
-            },
-          ]}>
+        {/* LOGO — layered circle backdrop + accent dots + pulsing ring,
+            matching the onboarding slide treatment for consistency */}
+        <View style={styles.logoStack}>
 
-          <View style={styles.logoBackground}>
+          <Animated.View
+            style={[
+              styles.pulseRing,
+              {
+                opacity: ringOpacity,
+                transform: [{scale: ringScale}],
+              },
+            ]}
+          />
+
+          <View style={styles.outerRing} />
+          <View style={styles.innerCircle} />
+
+          <View style={[styles.accentDot, styles.accentDotOne]} />
+          <View style={[styles.accentDot, styles.accentDotTwo]} />
+          <View style={[styles.accentDot, styles.accentDotThree]} />
+
+          <Animated.View
+            style={[
+              styles.logoWrapper,
+              {
+                opacity: logoOpacity,
+                transform: [
+                  {scale: Animated.multiply(logoScale, breatheScale)},
+                ],
+              },
+            ]}>
 
             <Image
               source={require('../../assets/images/onboarding/grocery1.png')}
@@ -145,60 +291,49 @@ const SplashScreen = ({navigation}) => {
               resizeMode="contain"
             />
 
-          </View>
+          </Animated.View>
 
-        </Animated.View>
+        </View>
 
         <Animated.View
           style={[
             styles.textContainer,
             {
-              opacity: contentOpacity,
-              transform: [{translateY: contentTranslate}],
+              opacity: textOpacity,
+              transform: [{translateY: textTranslate}],
             },
           ]}>
 
-          <Text style={styles.title}>
-            Fresh Basket
-          </Text>
+          <Text style={styles.title}>Fresh Basket</Text>
+          <View style={styles.titleUnderline} />
+          <Text style={styles.subtitle}>Fresh groceries.</Text>
+          <Text style={styles.subtitle}>Simple shopping.</Text>
 
-          <Text style={styles.subtitle}>
-            Everything Fresh,{' '}
-            <Text style={styles.subtitleHighlight}>
-              Right at Your Doorstep
-            </Text>
-          </Text>
+        </Animated.View>
 
+        {/* TAGLINE ROW — echoes the leaf-icon tagline style used on Signup */}
+        <Animated.View style={[styles.taglineRow, {opacity: taglineOpacity}]}>
+          <Ionicons name="leaf-outline" size={13} color={Colors.primary} />
+          <Text style={styles.taglineText}>100% fresh, always on time</Text>
         </Animated.View>
 
       </View>
 
-      {/* LOADER */}
-
-      <Animated.View
+      {/* PROGRESS BAR — fills over the 7s splash duration, pinned above
+          the safe-area inset like the onboarding button */}
+      <View
         style={[
-          styles.loaderContainer,
-          {
-            opacity: loaderOpacity,
-          },
+          styles.progressWrapper,
+          {paddingBottom: Math.max(insets.bottom, 30) + 16},
         ]}>
+        <View style={styles.progressTrack}>
+          <Animated.View
+            style={[styles.progressFill, {width: progressBarWidth}]}
+          />
+        </View>
+      </View>
 
-        <Animated.View
-          style={[
-            styles.spinner,
-            {
-              transform: [{rotate: spinnerSpin}],
-            },
-          ]}
-        />
-
-        <Text style={styles.loadingText}>
-          Loading...
-        </Text>
-
-      </Animated.View>
-
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -208,143 +343,202 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: Colors.onboardingBg,
     overflow: 'hidden',
   },
 
-  /* BACKGROUND */
-
-  circleTop: {
-    position: 'absolute',
-    width: 330,
-    height: 330,
-    borderRadius: 165,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    top: -150,
-    right: -100,
-  },
-
-  circleBottom: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    bottom: -140,
-    left: -120,
-  },
-
-  circleSmall: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    top: 160,
-    left: -40,
-  },
-
-  /* CONTENT */
-
   content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -35,
+    marginTop: -30,
   },
 
+  logoStack: {
+    width: LOGO_CIRCLE,
+    height: LOGO_CIRCLE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  outerRing: {
+    position: 'absolute',
+    width: LOGO_CIRCLE,
+    height: LOGO_CIRCLE,
+    borderRadius: LOGO_CIRCLE / 2,
+    backgroundColor: 'rgba(46,125,50,0.06)',
+  },
+
+  innerCircle: {
+    position: 'absolute',
+    width: LOGO_CIRCLE * 0.82,
+    height: LOGO_CIRCLE * 0.82,
+    borderRadius: (LOGO_CIRCLE * 0.82) / 2,
+    backgroundColor: Colors.primarySoft,
+  },
+
+  accentDot: {
+    position: 'absolute',
+    borderRadius: 999,
+  },
+
+  accentDotOne: {
+    width: 14,
+    height: 14,
+    backgroundColor: Colors.secondary,
+    top: 4,
+    right: 8,
+  },
+
+  accentDotTwo: {
+    width: 10,
+    height: 10,
+    backgroundColor: Colors.primaryLight,
+    bottom: 10,
+    left: 0,
+  },
+
+  accentDotThree: {
+    width: 7,
+    height: 7,
+    backgroundColor: Colors.accent,
+    top: 34,
+    left: -6,
+  },
+
+  pulseRing: {
+    position: 'absolute',
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: Colors.primaryLight,
+  },
+
+  // Logo enlarged so it fills most of its circle backdrop, same fix
+  // applied to the onboarding illustration.
   logoWrapper: {
+    width: LOGO_CIRCLE * 0.62,
+    height: LOGO_CIRCLE * 0.62,
     alignItems: 'center',
     justifyContent: 'center',
+    ...styleShadow(),
   },
-
-  /*
-    Reference image:
-    white rounded square ≈ 185-195px
-  */
-
-  logoBackground: {
-    width: 190,
-    height: 190,
-    borderRadius: 28,
-
-    backgroundColor: 'rgba(255,255,255,0.96)',
-
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    elevation: 10,
-  },
-
-  /*
-    Keep the actual image slightly smaller
-    so it has a clean white margin.
-  */
 
   logo: {
-    width: 165,
-    height: 165,
+    width: '100%',
+    height: '100%',
   },
-
-  /* TEXT */
 
   textContainer: {
     alignItems: 'center',
-    marginTop: 20,
-    paddingHorizontal: 16,
+    marginTop: 18,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.white,
-    letterSpacing: 0.2,
+    ...Typography.h1,
+    fontSize: 27,
+    lineHeight: 33,
+    color: Colors.primaryDark,
     textAlign: 'center',
+    letterSpacing: -0.3,
+  },
+
+  titleUnderline: {
+    width: 34,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.primary,
+    marginTop: 8,
+    marginBottom: 8,
   },
 
   subtitle: {
-    marginTop: 8,
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
-    textAlign: 'center',
-    lineHeight: 21,
-  },
-
-  subtitleHighlight: {
-    color: Colors.white,
-    fontWeight: '700',
-  },
-
-  /* LOADER */
-
-  loaderContainer: {
-    position: 'absolute',
-    bottom: 90,
-    alignItems: 'center',
-  },
-
-  spinner: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.25)',
-    borderTopColor: Colors.white,
-    borderRightColor: Colors.white,
-  },
-
-  loadingText: {
-    marginTop: 12,
+    ...Typography.body,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.85)',
-    letterSpacing: 0.3,
+    lineHeight: 19,
+    color: Colors.primaryDark,
+    textAlign: 'center',
   },
 
+  taglineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: Colors.primarySoft,
+  },
+
+  taglineText: {
+    ...Typography.caption,
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+
+  progressWrapper: {
+    paddingHorizontal: 60,
+  },
+
+  progressTrack: {
+    height: 4,
+    width: '100%',
+    borderRadius: 2,
+    backgroundColor: Colors.primarySoft,
+    overflow: 'hidden',
+  },
+
+  progressFill: {
+    height: '100%',
+    borderRadius: 2,
+    backgroundColor: Colors.primary,
+  },
+
+  blob: {
+    position: 'absolute',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+
+  blobOne: {
+    width: 130,
+    height: 130,
+    top: -40,
+    left: -35,
+  },
+
+  blobTwo: {
+    width: 100,
+    height: 100,
+    bottom: -30,
+    right: -25,
+  },
+
+  blobThree: {
+    width: 70,
+    height: 70,
+    top: 110,
+    right: -20,
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
+
+  blobFour: {
+    width: 55,
+    height: 55,
+    bottom: 140,
+    left: -15,
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
 });
+
+function styleShadow() {
+  return {
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 4},
+  };
+}

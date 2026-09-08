@@ -1,176 +1,216 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 
 import {
   View,
-  FlatList,
-  TouchableOpacity,
   Text,
+  ScrollView,
+  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import OnboardingItem from '../../components/onboarding/OnboardingItem';
-import Pagination from '../../components/onboarding/Pagination';
-import BottomButtons from '../../components/onboarding/BottomButtons';
+import Ionicons from '@react-native-vector-icons/ionicons';
 
-import {onboardingData} from '../../data/onboardingData';
+import Header from '../../components/home/Header';
+import SearchBar from '../../components/home/SearchBar';
+import LocationCard from '../../components/home/LocationCard';
+import OfferBanner from '../../components/home/OfferBanner';
+import CategoryCard from '../../components/home/CategoryCard';
+import ProductCard from '../../components/home/ProductCard';
+import DrawerMenu from '../../components/navigation/DrawerMenu.jsx';
+
+import categories from '../../data/categories';
+import products from '../../data/products';
+
+import {useCart} from '../../context/CartContext';
 
 import {
   Colors,
-  Spacing,
   Typography,
 } from '../../theme';
 
-const OnboardingScreen = ({onDone}) => {
-  const [activeIndex, setActiveIndex] = useState(0);
+const HomeScreen = ({navigation}) => {
+  const [search, setSearch] = useState('');
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
-  const listRef = useRef(null);
+  const {addToCart} = useCart();
 
-  const isLastSlide =
-    activeIndex === onboardingData.length - 1;
-
-  const handleScroll = event => {
-    const offsetX =
-      event.nativeEvent.contentOffset.x;
-
-    const width =
-      event.nativeEvent.layoutMeasurement.width;
-
-    if (!width) {
-      return;
-    }
-
-    const index = Math.round(offsetX / width);
-
-    if (
-      index >= 0 &&
-      index < onboardingData.length &&
-      index !== activeIndex
-    ) {
-      setActiveIndex(index);
-    }
-  };
-
-  const handleNext = () => {
-    if (isLastSlide) {
-      onDone?.();
-      return;
-    }
-
-    listRef.current?.scrollToIndex({
-      index: activeIndex + 1,
-      animated: true,
-    });
-  };
-
-  const handleSkip = () => {
-    onDone?.();
-  };
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
 
-      {/* SKIP */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}>
 
-      {!isLastSlide && (
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={handleSkip}
-          activeOpacity={0.7}>
+        <Header
+          onMenuPress={() => setDrawerVisible(true)}
+        />
 
-          <Text style={styles.skipText}>
-            Skip
+        <SearchBar
+          value={search}
+          onChangeText={setSearch}
+        />
+
+        <LocationCard />
+
+        <OfferBanner />
+
+        {/* CATEGORY HEADER */}
+
+        <View style={styles.sectionHeader}>
+
+          <Text style={styles.sectionTitle}>
+            Shop by Category
           </Text>
 
-        </TouchableOpacity>
-      )}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Categories')}>
 
-      {/* SLIDES */}
+            <View style={styles.seeAll}>
+              <Text style={styles.seeAllText}>
+                See All
+              </Text>
 
-      <FlatList
-        ref={listRef}
-        data={onboardingData}
+              <Ionicons
+                name="chevron-forward"
+                size={17}
+                color={Colors.primary}
+              />
+            </View>
 
-        renderItem={({item}) => (
-          <OnboardingItem item={item} />
-        )}
+          </TouchableOpacity>
 
-        keyExtractor={item => item.id}
+        </View>
 
-        horizontal
-        pagingEnabled
+        {/* CATEGORIES */}
 
-        bounces={false}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}>
 
-        showsHorizontalScrollIndicator={false}
+          {categories.slice(0, 4).map(item => (
+            <CategoryCard
+              key={item.id}
+              item={item}
+              onPress={() =>
+                navigation.navigate('ProductListing', {category: item})
+              }
+            />
+          ))}
 
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
+        </ScrollView>
 
-        getItemLayout={(data, index) => ({
-          length: data?.length
-            ? undefined
-            : 0,
-          offset: 0,
-          index,
-        })}
+        {/* PRODUCT HEADER */}
+
+        <View style={styles.sectionHeader}>
+
+          <Text style={styles.sectionTitle}>
+            Featured Products
+          </Text>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Categories')}>
+            <View style={styles.seeAll}>
+
+              <Text style={styles.seeAllText}>
+                See All
+              </Text>
+
+              <Ionicons
+                name="chevron-forward"
+                size={17}
+                color={Colors.primary}
+              />
+
+            </View>
+          </TouchableOpacity>
+
+        </View>
+
+        {/* PRODUCTS */}
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}>
+
+          {filteredProducts.map(item => (
+            <ProductCard
+              key={item.id}
+              item={item}
+              onPress={product =>
+                navigation.navigate('ProductDetail', {product})
+              }
+              onAdd={() => addToCart(item)}
+            />
+          ))}
+
+        </ScrollView>
+
+        <View style={styles.bottomSpace} />
+
+      </ScrollView>
+
+      <DrawerMenu
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        navigation={navigation}
       />
-
-      {/* BOTTOM */}
-
-      <View style={styles.bottomSection}>
-
-        <Pagination
-          count={onboardingData.length}
-          activeIndex={activeIndex}
-        />
-
-        <BottomButtons
-          isLastSlide={isLastSlide}
-          onPress={handleNext}
-        />
-
-      </View>
 
     </SafeAreaView>
   );
 };
 
-export default OnboardingScreen;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-
     backgroundColor: Colors.background,
   },
 
-  skipButton: {
-    position: 'absolute',
-
-    top: 12,
-    right: 20,
-
-    zIndex: 20,
-
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
 
-  skipText: {
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    ...Typography.h3,
+    fontSize: 20,
+    fontWeight: '900',
+    color: Colors.text,
+  },
+
+  seeAll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  seeAllText: {
     ...Typography.bodySmall,
-
-    fontWeight: '700',
-
+    fontWeight: '800',
     color: Colors.primary,
   },
 
-  bottomSection: {
-    backgroundColor: Colors.background,
+  horizontalList: {
+    paddingRight: 10,
+  },
 
-    paddingTop: Spacing.sm,
+  bottomSpace: {
+    height: 20,
   },
 });
