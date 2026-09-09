@@ -4,7 +4,7 @@ export const onboardingData = [
     image: require('../assets/images/onboarding/grocery.png'),
     title: 'Fresh Groceries',
     description:
-      'Shop fresh groceries and daily essentials from the comfort of your home.',
+      'Shop fresh fruits, vegetables, dairy and everyday essentials from one place.',
   },
 
   {
@@ -12,7 +12,7 @@ export const onboardingData = [
     image: require('../assets/images/onboarding/delivery.png'),
     title: 'Fast Delivery',
     description:
-      'Get your groceries delivered quickly and safely to your doorstep.',
+      'Get your groceries delivered quickly and conveniently right to your doorstep.',
   },
 
   {

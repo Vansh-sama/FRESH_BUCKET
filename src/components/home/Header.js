@@ -1,39 +1,64 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from 'react-native';
+
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-const Header = () => {
+import {
+  Colors,
+  Typography,
+  Spacing,
+} from '../../theme';
+
+const Header = ({onMenuPress, onNotificationPress}) => {
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.deliver}>Deliver To</Text>
 
-        <View style={styles.locationRow}>
-          <Ionicons
-            name="location"
-            size={18}
-            color="#FF8F00"
-          />
-
-          <Text style={styles.location}>
-            Sirsa, Haryana
-          </Text>
-
-          <Ionicons
-            name="chevron-down"
-            size={18}
-            color="#263238"
-          />
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.profile}>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={onMenuPress}
+        activeOpacity={0.7}>
         <Ionicons
-          name="person"
-          size={24}
-          color="#2E7D32"
+          name="menu-outline"
+          size={31}
+          color={Colors.text}
         />
       </TouchableOpacity>
+
+      <View style={styles.brandContainer}>
+
+        <Image
+          source={require('../../assets/images/onboarding/grocery1.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+
+        <Text style={styles.brand}>
+          Fresh Basket
+        </Text>
+
+      </View>
+
+      <TouchableOpacity
+        style={styles.notificationButton}
+        onPress={onNotificationPress}
+        activeOpacity={0.7}>
+
+        <Ionicons
+          name="notifications-outline"
+          size={28}
+          color={Colors.primary}
+        />
+
+        <View style={styles.notificationDot} />
+
+      </TouchableOpacity>
+
     </View>
   );
 };
@@ -42,40 +67,52 @@ export default Header;
 
 const styles = StyleSheet.create({
   container: {
+    height: 68,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: '#F8F7F3',
   },
 
-  deliver: {
-    fontSize: 13,
-    color: '#64748B',
+  menuButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
   },
 
-  locationRow: {
+  brandContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    flex: 1,
+    marginLeft: 2,
   },
 
-  location: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#263238',
-    marginHorizontal: 5,
+  logo: {
+    width: 48,
+    height: 48,
+    marginRight: 8,
   },
 
-  profile: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    backgroundColor: '#FFFFFF',
+  brand: {
+    ...Typography.h2,
+    fontSize: 25,
+    fontWeight: '800',
+    color: Colors.text,
+  },
+
+  notificationButton: {
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 3,
+  },
+
+  notificationDot: {
+    position: 'absolute',
+    top: 7,
+    right: 7,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FF5A45',
   },
 });

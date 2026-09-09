@@ -34,6 +34,13 @@ const AppNavigator = () => {
       <Stack.Screen
         name="Main"
         component={MainStack}
+        options={{
+          // Stops the iOS edge-swipe-back / Android predictive-back
+          // gesture on the Tabs screen from bubbling up and popping
+          // this whole stack entry, which is what was revealing
+          // Signup/Onboarding underneath it.
+          gestureEnabled: false,
+        }}
       />
 
     </Stack.Navigator>

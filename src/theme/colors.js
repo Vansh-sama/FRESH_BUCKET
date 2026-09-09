@@ -3,6 +3,10 @@ const Colors = {
   primary: '#2E7D32',
   primaryLight: '#4CAF50',
   primaryDark: '#1B5E20',
+  primarySoft: '#DCF2E1',
+
+  // Onboarding
+  onboardingBg: '#F2FAF1',
 
   // Accent
   secondary: '#FFB300',
@@ -14,14 +18,14 @@ const Colors = {
   card: '#FFFFFF',
 
   // Text
-  text: '#1F2937',
+  text: '#18261D',
   textSecondary: '#64748B',
   textLight: '#94A3B8',
   white: '#FFFFFF',
 
   // Borders
   border: '#E5E7EB',
-  divider: '#F1F5F9',
+  divider: '#E9EDE9',
 
   // Status
   success: '#22C55E',
@@ -29,7 +33,6 @@ const Colors = {
   error: '#EF4444',
   info: '#3B82F6',
 
-  // Extra
   black: '#000000',
   transparent: 'transparent',
 };

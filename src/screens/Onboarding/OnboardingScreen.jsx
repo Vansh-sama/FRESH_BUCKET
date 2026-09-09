@@ -1,4 +1,7 @@
-import React, {useRef, useState} from 'react';
+import React, {
+  useRef,
+  useState,
+} from 'react';
 
 import {
   View,
@@ -6,14 +9,24 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  SafeAreaView,
+  StatusBar,
   Dimensions,
+  Animated,
 } from 'react-native';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
-import OnboardingItem from '../../components/onboarding/OnboardingItem';
+import Ionicons from '@react-native-vector-icons/ionicons';
+
+import OnboardingItem, {
+  CIRCLE_SIZE,
+} from '../../components/onboarding/OnboardingItem';
+
 import Pagination from '../../components/onboarding/Pagination';
+
 import BottomButtons from '../../components/onboarding/BottomButtons';
 
 import {onboardingData} from '../../data/onboardingData';
@@ -24,28 +37,71 @@ import {
   Typography,
 } from '../../theme';
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
+
+const SLIDE_HEIGHT = CIRCLE_SIZE + 165;
 
 const OnboardingScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const insets = useSafeAreaInsets();
+
   const listRef = useRef(null);
+
+  const slideEnter = useRef(new Animated.Value(0)).current;
+
+  const blobOneFloat = useRef(new Animated.Value(0)).current;
+  const blobTwoFloat = useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blobOneFloat, {
+          toValue: 1,
+          duration: 2600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blobOneFloat, {
+          toValue: 0,
+          duration: 2600,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blobTwoFloat, {
+          toValue: 1,
+          duration: 3200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blobTwoFloat, {
+          toValue: 0,
+          duration: 3200,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [blobOneFloat, blobTwoFloat]);
+
+  React.useEffect(() => {
+    slideEnter.setValue(0);
+    Animated.timing(slideEnter, {
+      toValue: 1,
+      duration: 380,
+      useNativeDriver: true,
+    }).start();
+  }, [activeIndex, slideEnter]);
 
   const isLastSlide =
     activeIndex === onboardingData.length - 1;
-
-
-  /* ================================
-     SCROLL
-  ================================= */
 
   const handleScroll = event => {
     const offsetX =
       event.nativeEvent.contentOffset.x;
 
-    const index = Math.round(
-      offsetX / width,
-    );
+    const index = Math.round(offsetX / width);
 
     if (
       index !== activeIndex &&
@@ -56,16 +112,7 @@ const OnboardingScreen = ({navigation}) => {
     }
   };
 
-
-  /* ================================
-     NEXT
-     Route name must match AppNavigator —
-     there is no 'Login' screen registered,
-     only 'Signup'.
-  ================================= */
-
   const handleNext = () => {
-
     if (isLastSlide) {
       navigation.replace('Signup');
       return;
@@ -75,30 +122,65 @@ const OnboardingScreen = ({navigation}) => {
       index: activeIndex + 1,
       animated: true,
     });
-
   };
-
-
-  /* ================================
-     SKIP
-  ================================= */
 
   const handleSkip = () => {
     navigation.replace('Signup');
   };
 
+  const blobOneTranslateY = blobOneFloat.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -14],
+  });
+
+  const blobTwoTranslateY = blobTwoFloat.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 12],
+  });
+
+  const slideOpacity = slideEnter;
+  const slideTranslateY = slideEnter.interpolate({
+    inputRange: [0, 1],
+    outputRange: [12, 0],
+  });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={[
+        'top',
+        'left',
+        'right',
+        'bottom',
+      ]}>
 
-      {/* ================================
-          SKIP
-      ================================= */}
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={Colors.onboardingBg}
+      />
+
+      <Animated.View
+        style={[
+          styles.blob,
+          styles.blobOne,
+          {transform: [{translateY: blobOneTranslateY}]},
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.blob,
+          styles.blobTwo,
+          {transform: [{translateY: blobTwoTranslateY}]},
+        ]}
+      />
 
       {!isLastSlide && (
         <TouchableOpacity
-          style={styles.skipButton}
-          activeOpacity={0.75}
+          style={[
+            styles.skipButton,
+            {top: insets.top + 12},
+          ]}
+          activeOpacity={0.8}
           onPress={handleSkip}>
 
           <Text style={styles.skipText}>
@@ -110,148 +192,172 @@ const OnboardingScreen = ({navigation}) => {
             size={14}
             color={Colors.primary}
           />
-
         </TouchableOpacity>
       )}
 
+      {/* content is split into two zones: the slide block centers
+          itself in the remaining space (flex:1), while pagination +
+          button are pinned as the very last elements at the bottom,
+          right above the safe-area inset — no dead gap beneath them */}
+      <View style={styles.content}>
 
-      {/* ================================
-          SLIDES
-      ================================= */}
+        <Animated.View
+          style={[
+            styles.slideArea,
+            {
+              opacity: slideOpacity,
+              transform: [{translateY: slideTranslateY}],
+            },
+          ]}>
+          <FlatList
+            ref={listRef}
 
-      <FlatList
-        ref={listRef}
+            data={onboardingData}
 
-        style={styles.flatList}
+            renderItem={({item}) => (
+              <OnboardingItem item={item} />
+            )}
 
-        data={onboardingData}
+            keyExtractor={item => item.id}
 
-        renderItem={({item}) => (
-          <OnboardingItem item={item} />
-        )}
+            horizontal
 
-        keyExtractor={item => item.id}
+            pagingEnabled
 
-        horizontal
+            showsHorizontalScrollIndicator={false}
 
-        pagingEnabled
+            bounces={false}
 
-        showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
 
-        bounces={false}
+            scrollEventThrottle={16}
 
-        onScroll={handleScroll}
+            decelerationRate="fast"
 
-        scrollEventThrottle={16}
+            getItemLayout={(_, index) => ({
+              length: width,
+              offset: width * index,
+              index,
+            })}
 
-        decelerationRate="fast"
+            style={styles.flatList}
+          />
+        </Animated.View>
 
-        getItemLayout={(_, index) => ({
-          length: width,
-          offset: width * index,
-          index,
-        })}
-      />
+        {/* PAGINATION + BUTTON — bottom-anchored block */}
+        <View style={styles.bottomBlock}>
 
+          <View style={styles.paginationWrapper}>
+            <Pagination
+              count={onboardingData.length}
+              activeIndex={activeIndex}
+            />
+          </View>
 
-      {/* ================================
-          BOTTOM
-      ================================= */}
+          <View
+            style={[
+              styles.buttonWrapper,
+              {marginBottom: Math.max(insets.bottom, 12)},
+            ]}>
+            <BottomButtons
+              isLastSlide={isLastSlide}
+              onPress={handleNext}
+            />
+          </View>
 
-      <View style={styles.bottomSection}>
-
-        <Pagination
-          count={onboardingData.length}
-          activeIndex={activeIndex}
-        />
-
-        <BottomButtons
-          isLastSlide={isLastSlide}
-          onPress={handleNext}
-        />
+        </View>
 
       </View>
-
     </SafeAreaView>
   );
 };
 
 export default OnboardingScreen;
 
-
-/* =====================================================
-   STYLES
-===================================================== */
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
-
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.onboardingBg,
   },
 
+  blob: {
+    position: 'absolute',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
 
-  /* ================================
-     SKIP
-  ================================= */
+  blobOne: {
+    width: 110,
+    height: 110,
+    top: -30,
+    left: -30,
+  },
+
+  blobTwo: {
+    width: 90,
+    height: 90,
+    bottom: -30,
+    right: -20,
+  },
 
   skipButton: {
     position: 'absolute',
 
-    top: Spacing.lg,
+    right: 14,
 
-    right: Spacing.lg,
-
-    zIndex: 20,
+    zIndex: 50,
 
     flexDirection: 'row',
-
     alignItems: 'center',
 
-    paddingLeft: Spacing.md,
+    paddingVertical: 8,
+    paddingLeft: 14,
+    paddingRight: 10,
 
-    paddingRight: Spacing.sm,
+    borderRadius: 999,
 
-    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.primarySoft,
 
-    borderRadius: 20,
-
-    backgroundColor: '#E8F5E9',
+    gap: 3,
   },
 
   skipText: {
     ...Typography.bodySmall,
-
+    fontSize: 12,
     fontWeight: '700',
-
     color: Colors.primary,
-
-    marginRight: 2,
   },
 
+  content: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingTop: 56,
+  },
 
-  /* ================================
-     SLIDES
-  ================================= */
+  slideArea: {
+    flex: 1,
+    justifyContent: 'center',
+  },
 
   flatList: {
-    flex: 1,
+    flexGrow: 0,
+    height: SLIDE_HEIGHT,
   },
 
-
-  /* ================================
-     BOTTOM
-  ================================= */
-
-  bottomSection: {
-    backgroundColor: Colors.background,
-
-    paddingHorizontal: Spacing.xl,
-
-    paddingTop: Spacing.xs,
-
-    paddingBottom: Spacing.md,
+  bottomBlock: {
+    width: '100%',
   },
 
+  paginationWrapper: {
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+
+  buttonWrapper: {
+    width: '100%',
+    paddingHorizontal: Spacing.xxl,
+    marginTop: 20,
+  },
 });

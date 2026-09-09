@@ -1,31 +1,49 @@
 import React from 'react';
-import {View, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-const SearchBar = () => {
+import {
+  Colors,
+  Radius,
+} from '../../theme';
+
+const SearchBar = ({value, onChangeText, onFilterPress}) => {
   return (
     <View style={styles.container}>
-      <View style={styles.searchBox}>
-        <Ionicons
-          name="search-outline"
-          size={22}
-          color="#64748B"
-        />
 
-        <TextInput
-          placeholder="Search fruits, vegetables..."
-          placeholderTextColor="#94A3B8"
-          style={styles.input}
-        />
-      </View>
+      <Ionicons
+        name="search-outline"
+        size={25}
+        color={Colors.text}
+      />
 
-      <TouchableOpacity style={styles.filterBtn}>
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder="Search for groceries..."
+        placeholderTextColor="#687795"
+        style={styles.input}
+      />
+
+      <TouchableOpacity
+        style={styles.filterButton}
+        onPress={onFilterPress}
+        activeOpacity={0.7}>
+
         <Ionicons
           name="options-outline"
-          size={22}
-          color="#FFFFFF"
+          size={24}
+          color={Colors.primary}
         />
+
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -34,40 +52,31 @@ export default SearchBar;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-
-  searchBox: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    height: 55,
+    height: 57,
     borderRadius: 18,
-    paddingHorizontal: 15,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#DDE5E0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 18,
     elevation: 2,
   },
 
   input: {
     flex: 1,
-    marginLeft: 10,
-    color: '#263238',
-    fontSize: 15,
+    height: '100%',
+    paddingHorizontal: 13,
+    fontSize: 16,
+    color: Colors.text,
   },
 
-  filterBtn: {
-    width: 55,
-    height: 55,
-    backgroundColor: '#2E7D32',
-    marginLeft: 12,
-    borderRadius: 18,
+  filterButton: {
+    width: 58,
+    height: '100%',
+    borderLeftWidth: 1,
+    borderLeftColor: '#E1E7E3',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 3,
   },
 });
