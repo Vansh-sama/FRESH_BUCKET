@@ -8,11 +8,9 @@ import {
   BackHandler,
 } from 'react-native';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import Ionicons from '@react-native-vector-icons/ionicons';
-
-import HomeScreen from '../screens/Home/HomeScreen';
+import HomeScreen from '../screens/home/Home';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
@@ -53,26 +51,45 @@ const tabs = [
   },
 ];
 
-// `navigation` here is the REAL stack navigation React Navigation passes
-// in automatically (this component is registered as a <Stack.Screen>).
-// Previously this prop was dropped entirely and replaced with a fake
-// tab-switcher that only understood the 4 tab names — any tab screen
-// calling navigation.navigate('ProductDetail') or ('MyOrders') silently
-// did nothing. Now tab-name calls switch tabs locally; anything else
-// (ProductDetail, ProductListing, Checkout, MyOrders, ...) is forwarded
-// to the real stack navigator.
+/*
+ * BottomNavigator
+ *
+ * This component is registered inside the real Stack Navigator.
+ *
+ * Tab screens are handled locally:
+ *   Home
+ *   Categories
+ *   Cart
+ *   Profile
+ *
+ * Any other screen is forwarded to the real Stack Navigator:
+ *   ProductDetail
+ *   ProductListing
+ *   Checkout
+ *   MyOrders
+ *   OrderTracking
+ *   etc.
+ */
 const BottomNavigator = ({navigation}) => {
   const [activeTab, setActiveTab] = React.useState('Home');
+
   const insets = useSafeAreaInsets();
 
   const {cartCount} = useCart();
 
+  /*
+   * Android hardware back button
+   *
+   * If user is on another tab -> go back to Home.
+   * If already on Home -> exit the application.
+   */
   React.useEffect(() => {
     const onBackPress = () => {
       if (activeTab !== 'Home') {
         setActiveTab('Home');
         return true;
       }
+
       BackHandler.exitApp();
       return true;
     };
@@ -85,18 +102,37 @@ const BottomNavigator = ({navigation}) => {
     return () => subscription.remove();
   }, [activeTab]);
 
-  const ActiveScreen = tabs.find(
+  /*
+   * Find currently selected tab screen.
+   */
+  const activeTabData = tabs.find(
     tab => tab.name === activeTab,
-  ).component;
+  );
 
+  const ActiveScreen = activeTabData?.component || HomeScreen;
+
+  /*
+   * Child navigation object.
+   *
+   * Tab navigation:
+   *   navigation.navigate('Cart')
+   *   navigation.navigate('Profile')
+   *
+   * will switch the custom bottom tab.
+   *
+   * Other screens:
+   *   navigation.navigate('ProductDetail')
+   *   navigation.navigate('Checkout')
+   *
+   * will go through the actual Stack Navigator.
+   */
   const childNavigation = {
     navigate: (screen, params) => {
       if (TAB_NAMES.includes(screen)) {
         setActiveTab(screen);
         return;
       }
-      // Not a tab — it's a real stack screen (ProductDetail, Checkout,
-      // MyOrders, OrderTracking, ...). Forward it instead of dropping it.
+
       navigation.navigate(screen, params);
     },
 
@@ -105,6 +141,7 @@ const BottomNavigator = ({navigation}) => {
         setActiveTab('Home');
         return;
       }
+
       navigation.goBack();
     },
 
@@ -113,25 +150,28 @@ const BottomNavigator = ({navigation}) => {
         setActiveTab(screen);
         return;
       }
+
       navigation.replace(screen, params);
     },
   };
 
   return (
     <View style={styles.container}>
-
+      {/* Active Screen */}
       <View style={styles.screen}>
         <ActiveScreen navigation={childNavigation} />
       </View>
 
+      {/* Bottom Navigation */}
       <View
         style={[
           styles.bottomBar,
-          { height: 60 + insets.bottom, paddingBottom: insets.bottom },
+          {
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom,
+          },
         ]}>
-
         {tabs.map(tab => {
-
           const active = activeTab === tab.name;
 
           return (
@@ -140,23 +180,18 @@ const BottomNavigator = ({navigation}) => {
               style={styles.tab}
               activeOpacity={0.75}
               onPress={() => setActiveTab(tab.name)}>
-
+              
+              {/* Icon */}
               <View style={styles.iconContainer}>
+                <Text
+                  style={[
+                    styles.icon,
+                    active && styles.activeIcon,
+                  ]}>
+                  {getTabIcon(tab.name, active)}
+                </Text>
 
-                <Ionicons
-                  name={
-                    active
-                      ? tab.activeIcon
-                      : tab.icon
-                  }
-                  size={25}
-                  color={
-                    active
-                      ? Colors.primary
-                      : '#718096'
-                  }
-                />
-
+                {/* Cart Badge */}
                 {tab.name === 'Cart' && cartCount > 0 && (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>
@@ -164,27 +199,50 @@ const BottomNavigator = ({navigation}) => {
                     </Text>
                   </View>
                 )}
-
               </View>
 
+              {/* Label */}
               <Text
                 style={[
                   styles.tabText,
                   active && styles.activeText,
                 ]}>
-
                 {tab.name}
-
               </Text>
-
             </TouchableOpacity>
           );
         })}
-
       </View>
-
     </View>
   );
+};
+
+/*
+ * Simple icon mapping.
+ *
+ * Using text symbols here keeps this file independent from
+ * react-native-vector-icons.
+ *
+ * If your project already uses Ionicons, you can replace this
+ * with Ionicons later.
+ */
+const getTabIcon = (tabName, active) => {
+  switch (tabName) {
+    case 'Home':
+      return active ? '⌂' : '⌂';
+
+    case 'Categories':
+      return '▦';
+
+    case 'Cart':
+      return '🛒';
+
+    case 'Profile':
+      return '●';
+
+    default:
+      return '•';
+  }
 };
 
 export default BottomNavigator;
@@ -207,6 +265,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     elevation: 15,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
   },
 
   tab: {
@@ -218,9 +282,21 @@ const styles = StyleSheet.create({
 
   iconContainer: {
     height: 30,
-    width: 35,
+    width: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+
+  icon: {
+    fontSize: 24,
+    color: '#718096',
+    fontWeight: '600',
+  },
+
+  activeIcon: {
+    color: Colors.primary,
+    fontWeight: '800',
   },
 
   tabText: {
