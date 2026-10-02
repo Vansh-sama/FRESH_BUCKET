@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-import products from '../../data/products';
+import {getProductsApi} from '../../services/catalogService';
 import {useCart} from '../../context/CartContext';
 
 import {
@@ -37,6 +37,22 @@ const ProductListingScreen = ({navigation, route}) => {
   const [search, setSearch] = useState('');
   const [sortVisible, setSortVisible] = useState(false);
   const [sortBy, setSortBy] = useState('default');
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const result = await getProductsApi({
+          category: category?.id || category?._id,
+          limit: 100,
+        });
+        setProducts(result.products);
+      } catch (error) {
+        console.log('PRODUCTS API ERROR:', error?.response?.data || error?.message);
+      }
+    };
+    load();
+  }, [category?.id, category?._id]);
 
   // products.js doesn't have a category field yet, so this can't do
   // a real category match — it shows the full catalog, filtered only

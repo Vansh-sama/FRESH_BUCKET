@@ -1,5 +1,3 @@
-// navigation/AuthStack.js
-
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -12,8 +10,12 @@ const Stack = createNativeStackNavigator();
 
 const AuthStack = ({onLoginSuccess}) => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Stack.Screen name="Login">
         {props => (
           <LoginScreen
@@ -37,7 +39,6 @@ const AuthStack = ({onLoginSuccess}) => {
         name="Otp"
         component={OtpScreen}
       />
-
     </Stack.Navigator>
   );
 };

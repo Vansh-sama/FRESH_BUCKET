@@ -11,6 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Ionicons from '@react-native-vector-icons/ionicons';
 
+import {useOrders} from '../../context/OrdersContext';
+
 import {
   Colors,
   Typography,
@@ -50,6 +52,7 @@ const generateOrderId = () =>
 
 const OrderTrackingScreen = ({navigation, route}) => {
   const orderTotal = route?.params?.orderTotal ?? 0;
+  const {getOrderById} = useOrders();
 
   // Reuse the order id passed from OrderSuccess so it's the same
   // number across both screens, instead of generating a second
@@ -58,6 +61,7 @@ const OrderTrackingScreen = ({navigation, route}) => {
     () => route?.params?.orderId ?? generateOrderId(),
   );
   const [currentStep, setCurrentStep] = useState(0);
+  const [backendStatus, setBackendStatus] = useState('placed');
 
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -67,21 +71,38 @@ const OrderTrackingScreen = ({navigation, route}) => {
   const celebrateTwo = useRef(new Animated.Value(0)).current;
   const celebrateThree = useRef(new Animated.Value(0)).current;
 
-  // Auto-advances through the steps every few seconds — since there's
-  // no real backend/rider tracking yet, this gives a live "something
-  // is happening" demo feel rather than a static screen, which reads
-  // much better in a portfolio walkthrough.
   useEffect(() => {
-    if (currentStep >= STEPS.length - 1) {
-      return;
-    }
+    let active = true;
 
-    const timer = setTimeout(() => {
-      setCurrentStep(step => Math.min(step + 1, STEPS.length - 1));
-    }, 3200);
+    const load = async () => {
+      if (!orderId) return;
+      const order = await getOrderById(orderId);
+      if (!active || !order) return;
 
-    return () => clearTimeout(timer);
-  }, [currentStep]);
+      const status = order.status || 'placed';
+      setBackendStatus(status);
+
+      const index =
+        status === 'delivered'
+          ? 3
+          : status === 'out_for_delivery'
+          ? 2
+          : status === 'preparing'
+          ? 1
+          : 0;
+
+      setCurrentStep(index);
+    };
+
+    load();
+
+    const interval = setInterval(load, 15000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [orderId, getOrderById]);
 
   useEffect(() => {
     const loop = Animated.loop(
@@ -186,9 +207,9 @@ const OrderTrackingScreen = ({navigation, route}) => {
             {STEPS[currentStep].subtitle}
           </Text>
 
-          {!isDelivered && (
+          {!isDelivered && backendStatus !== 'cancelled' && (
             <Text style={styles.eta}>
-              Estimated delivery in {(STEPS.length - 1 - currentStep) * 8} mins
+              Live order status from Fresh Basket
             </Text>
           )}
 

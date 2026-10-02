@@ -17,6 +17,10 @@ import {Colors, Spacing, Typography, Radius} from '../../theme';
 import {registerUser} from '../../services/authService';
 
 const SignupScreen = ({navigation}) => {
+  // ======================================
+  // STATE
+  // ======================================
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,13 +34,54 @@ const SignupScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
 
   // ======================================
+  // GO TO LOGIN
+  // ======================================
+
+  const handleGoToLogin = () => {
+    /*
+      Login and Signup are now inside the same AuthStack.
+
+      Normal flow:
+      Login -> Signup
+      So goBack() will return to Login.
+
+      If there is no previous route, use the parent Auth
+      navigator as a fallback.
+    */
+
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
+    const parent = navigation.getParent();
+
+    if (parent) {
+      parent.navigate('Login');
+      return;
+    }
+
+    console.warn(
+      'Unable to navigate to Login.',
+    );
+  };
+
+  // ======================================
   // REGISTER
   // ======================================
 
   const handleSignup = async () => {
+    // Prevent double click
+    if (loading) {
+      return;
+    }
+
     setError('');
 
-    // Required fields
+    // ======================================
+    // REQUIRED FIELDS
+    // ======================================
+
     if (
       !name.trim() ||
       !email.trim() ||
@@ -48,23 +93,49 @@ const SignupScreen = ({navigation}) => {
       return;
     }
 
-    // Password match
+    // ======================================
+    // EMAIL VALIDATION
+    // ======================================
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    // ======================================
+    // PASSWORD MATCH
+    // ======================================
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    // Phone validation
-    if (phone.trim().length !== 10) {
+    // ======================================
+    // PHONE VALIDATION
+    // ======================================
+
+    const phoneDigits = phone.replace(/\D/g, '');
+
+    if (phoneDigits.length !== 10) {
       setError('Please enter a valid 10-digit phone number');
       return;
     }
 
-    // Password validation
+    // ======================================
+    // PASSWORD VALIDATION
+    // ======================================
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
+
+    // ======================================
+    // API CALL
+    // ======================================
 
     try {
       setLoading(true);
@@ -72,30 +143,52 @@ const SignupScreen = ({navigation}) => {
       const data = await registerUser({
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        phone: phone.trim(),
-        password: password,
+        phone: phoneDigits,
+        password,
       });
 
       console.log('REGISTER RESPONSE:', data);
 
-      if (data.success) {
-        // Registration successful
-        navigation.navigate('Login', {
-          registered: true,
-        });
-      } else {
-        setError(
-          data.message || 'Registration failed. Please try again.',
-        );
+      // ======================================
+      // SUCCESS
+      // ======================================
+
+      if (data?.success) {
+        /*
+          Signup is opened from Login.
+
+          Therefore goBack() returns the user
+          to Login automatically.
+        */
+
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          console.warn(
+            'Signup successful, but no previous route is available.',
+          );
+        }
+
+        return;
       }
-    } catch (error) {
+
+      // ======================================
+      // API FAILURE
+      // ======================================
+
+      setError(
+        data?.message ||
+          'Registration failed. Please try again.',
+      );
+    } catch (err) {
       console.log(
         'REGISTER ERROR:',
-        error.response?.data || error.message,
+        err?.response?.data || err?.message,
       );
 
       setError(
-        error.response?.data?.message ||
+        err?.response?.data?.message ||
+          err?.message ||
           'Unable to connect to server. Please try again.',
       );
     } finally {
@@ -109,6 +202,8 @@ const SignupScreen = ({navigation}) => {
 
   const handleGoogleSignup = () => {
     console.log('Google signup pressed');
+
+    // Google authentication can be added later.
   };
 
   // ======================================
@@ -117,6 +212,8 @@ const SignupScreen = ({navigation}) => {
 
   const handleAppleSignup = () => {
     console.log('Apple signup pressed');
+
+    // Apple authentication can be added later.
   };
 
   // ======================================
@@ -124,11 +221,33 @@ const SignupScreen = ({navigation}) => {
   // ======================================
 
   const handleSkip = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'MainTabs'}],
-    });
+    /*
+      If Signup was opened from Login,
+      go back to Login.
+
+      Otherwise try to open Main.
+    */
+
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
+    const parent = navigation.getParent();
+
+    if (parent) {
+      parent.navigate('Main');
+      return;
+    }
+
+    console.warn(
+      'Skip pressed, but no suitable navigator was found.',
+    );
   };
+
+  // ======================================
+  // UI
+  // ======================================
 
   return (
     <KeyboardAvoidingView
@@ -147,7 +266,7 @@ const SignupScreen = ({navigation}) => {
 
         <View style={styles.topRow}>
 
-          {/* Back */}
+          {/* BACK */}
 
           <TouchableOpacity
             style={styles.backButton}
@@ -157,7 +276,8 @@ const SignupScreen = ({navigation}) => {
               left: 10,
               right: 10,
             }}
-            onPress={() => navigation.goBack()}>
+            onPress={handleGoToLogin}
+            activeOpacity={0.8}>
 
             <Ionicons
               name="arrow-back"
@@ -167,7 +287,7 @@ const SignupScreen = ({navigation}) => {
 
           </TouchableOpacity>
 
-          {/* Skip */}
+          {/* SKIP */}
 
           <TouchableOpacity
             style={styles.skipButton}
@@ -230,6 +350,7 @@ const SignupScreen = ({navigation}) => {
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
+            autoCorrect={false}
           />
 
         </View>
@@ -276,7 +397,10 @@ const SignupScreen = ({navigation}) => {
             keyboardType="phone-pad"
             maxLength={10}
             value={phone}
-            onChangeText={setPhone}
+            onChangeText={text => {
+              const digits = text.replace(/\D/g, '');
+              setPhone(digits);
+            }}
           />
 
         </View>
@@ -299,6 +423,8 @@ const SignupScreen = ({navigation}) => {
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
+            autoCapitalize="none"
+            autoCorrect={false}
           />
 
           <TouchableOpacity
@@ -309,8 +435,9 @@ const SignupScreen = ({navigation}) => {
               right: 10,
             }}
             onPress={() =>
-              setShowPassword(!showPassword)
-            }>
+              setShowPassword(prev => !prev)
+            }
+            activeOpacity={0.7}>
 
             <Ionicons
               name={
@@ -344,6 +471,8 @@ const SignupScreen = ({navigation}) => {
             secureTextEntry={!showConfirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            autoCapitalize="none"
+            autoCorrect={false}
           />
 
           <TouchableOpacity
@@ -354,10 +483,9 @@ const SignupScreen = ({navigation}) => {
               right: 10,
             }}
             onPress={() =>
-              setShowConfirmPassword(
-                !showConfirmPassword,
-              )
-            }>
+              setShowConfirmPassword(prev => !prev)
+            }
+            activeOpacity={0.7}>
 
             <Ionicons
               name={
@@ -399,7 +527,8 @@ const SignupScreen = ({navigation}) => {
             loading && styles.disabledButton,
           ]}
           onPress={handleSignup}
-          disabled={loading}>
+          disabled={loading}
+          activeOpacity={0.85}>
 
           {loading ? (
             <ActivityIndicator
@@ -435,7 +564,8 @@ const SignupScreen = ({navigation}) => {
             styles.socialButton,
             styles.googleButton,
           ]}
-          onPress={handleGoogleSignup}>
+          onPress={handleGoogleSignup}
+          activeOpacity={0.8}>
 
           <Ionicons
             name="logo-google"
@@ -457,7 +587,8 @@ const SignupScreen = ({navigation}) => {
             styles.socialButton,
             styles.appleButton,
           ]}
-          onPress={handleAppleSignup}>
+          onPress={handleAppleSignup}
+          activeOpacity={0.8}>
 
           <Ionicons
             name="logo-apple"
@@ -473,9 +604,7 @@ const SignupScreen = ({navigation}) => {
                 color: Colors.textInverse,
               },
             ]}>
-
             Continue with Apple
-
           </Text>
 
         </TouchableOpacity>
@@ -489,9 +618,8 @@ const SignupScreen = ({navigation}) => {
           </Text>
 
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('Login')
-            }>
+            onPress={handleGoToLogin}
+            activeOpacity={0.8}>
 
             <Text style={styles.footerLink}>
               Log in
@@ -508,7 +636,6 @@ const SignupScreen = ({navigation}) => {
 };
 
 export default SignupScreen;
-
 
 // ======================================================
 // STYLES

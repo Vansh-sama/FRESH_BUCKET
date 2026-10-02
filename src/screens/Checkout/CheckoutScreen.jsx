@@ -17,7 +17,7 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import {useCart} from '../../context/CartContext';
 import {useAddress} from '../../context/AddressContext';
 import {useOrders} from '../../context/OrdersContext';
-import AddressPickerModal from '../../components/common/AddressPickerModal';
+//import AddressPickerModal from '../../components/common/AddressPickerModal';
 
 import {
   Colors,
@@ -66,7 +66,7 @@ const CheckoutScreen = ({navigation}) => {
   );
   const total = cartSubtotal + delivery + taxes;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!hasAddress) {
       Alert.alert(
         'Add a delivery address',
@@ -90,19 +90,31 @@ const CheckoutScreen = ({navigation}) => {
     // Record the order BEFORE clearing the cart — this is the fix.
     // Previously clearCart() ran first, so nothing about this order
     // was ever stored anywhere (My Orders / Track Orders had no data).
-    const order = placeOrder({
-      items: cart,
-      subtotal: total,
-      address,
-    });
-
-    setTimeout(() => {
-      clearCart();
-      navigation.replace('OrderSuccess', {
-        orderTotal: total,
-        orderId: order.id,
+    try {
+      const order = await placeOrder({
+        items: cart,
+        address,
+        paymentMethod: selectedPayment,
       });
-    }, 350);
+
+      clearCart();
+
+      navigation.replace('OrderSuccess', {
+        orderTotal: order?.total ?? total,
+        orderId: order?.id ?? order?._id,
+      });
+    } catch (error) {
+      console.log(
+        'PLACE ORDER API ERROR:',
+        error?.response?.data || error?.message,
+      );
+      setPlacing(false);
+      Alert.alert(
+        'Order failed',
+        error?.response?.data?.message ||
+          'Unable to place your order. Please try again.',
+      );
+    }
   };
 
   return (

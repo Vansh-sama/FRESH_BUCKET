@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {
   View,
@@ -29,7 +29,13 @@ const STATUS_COLOR = {
 };
 
 const MyOrdersScreen = ({navigation}) => {
-  const {orders} = useOrders();
+  const {orders, loadOrders} = useOrders();
+
+  useEffect(() => {
+    loadOrders().catch(error =>
+      console.log('MY ORDERS API ERROR:', error?.response?.data || error?.message),
+    );
+  }, [loadOrders]);
 
   const renderOrder = ({item}) => {
     const itemCount = item.items.reduce(

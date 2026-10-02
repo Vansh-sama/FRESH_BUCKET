@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {
   View,
@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-import categories from '../../data/categories';
+import {getCategoriesApi} from '../../services/catalogService';
 
 import {
   Colors,
@@ -29,6 +29,13 @@ const GRID_WIDTH = SCREEN_WIDTH - SIDEBAR_WIDTH;
 const CategoriesScreen = ({navigation}) => {
   const [selected, setSelected] = useState('All');
   const [search, setSearch] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    getCategoriesApi()
+      .then(setCategories)
+      .catch(error => console.log('CATEGORIES API ERROR:', error?.response?.data || error?.message));
+  }, []);
 
   const sidebarItems = ['All', ...categories.map(c => c.label)];
 

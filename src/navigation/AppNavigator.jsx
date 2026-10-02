@@ -3,7 +3,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import SplashScreen from '../screens/Splash/SplashScreen';
 import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
-import SignupScreen from '../screens/Auth/SignupScreen';
+
+import AuthStack from './AuthStack';
 import MainStack from './MainStack';
 
 const Stack = createNativeStackNavigator();
@@ -14,8 +15,8 @@ const AppNavigator = () => {
       initialRouteName="Splash"
       screenOptions={{
         headerShown: false,
-      }}>
-
+      }}
+    >
       <Stack.Screen
         name="Splash"
         component={SplashScreen}
@@ -27,22 +28,17 @@ const AppNavigator = () => {
       />
 
       <Stack.Screen
-        name="Signup"
-        component={SignupScreen}
+        name="Auth"
+        component={AuthStack}
       />
 
       <Stack.Screen
         name="Main"
         component={MainStack}
         options={{
-          // Stops the iOS edge-swipe-back / Android predictive-back
-          // gesture on the Tabs screen from bubbling up and popping
-          // this whole stack entry, which is what was revealing
-          // Signup/Onboarding underneath it.
           gestureEnabled: false,
         }}
       />
-
     </Stack.Navigator>
   );
 };

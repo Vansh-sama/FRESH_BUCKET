@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+
 import {
   View,
   Text,
@@ -14,68 +15,151 @@ import {
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import {useDispatch, useSelector} from 'react-redux';
+
 import {Colors, Typography, Spacing, Radius} from '../../theme';
-import {loginUser} from '../../services/authService';
+
+import {
+  loginUser,
+  selectAuthLoading,
+  selectAuthError,
+} from '../../redux/slices/authSlice';
+
 
 const LoginScreen = ({navigation, onLoginSuccess}) => {
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  // Redux loading/error
+  const loading = useSelector(selectAuthLoading);
+  const authError = useSelector(selectAuthError);
+
 
   // ======================================
   // LOGIN
   // ======================================
 
   const handleLogin = async () => {
+    // -------------------------------
+    // Validation
+    // -------------------------------
+
     if (!email.trim() || !password.trim()) {
       Alert.alert(
         'Missing Fields',
         'Please enter email and password.',
       );
+
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert(
+        'Invalid Email',
+        'Please enter a valid email address.',
+      );
+
       return;
     }
 
     try {
-      setLoading(true);
+      // -------------------------------
+      // Redux Login API
+      // -------------------------------
 
-      const data = await loginUser({
-        email: email.trim().toLowerCase(),
-        password,
-      });
+      const result = await dispatch(
+        loginUser({
+          email: email.trim().toLowerCase(),
+          password: password,
+        }),
+      );
 
-      console.log('LOGIN RESPONSE:', data);
+      console.log('LOGIN RESULT:', result);
 
-      if (data.success) {
+
+      // =================================
+      // LOGIN SUCCESS
+      // =================================
+
+      if (loginUser.fulfilled.match(result)) {
+        const data = result.payload;
+
+        console.log(
+          'LOGIN SUCCESS:',
+          data,
+        );
+
         Alert.alert(
           'Login Successful',
-          `Welcome back ${data.user?.name || ''}!`,
+          `Welcome back ${
+            data?.user?.name || ''
+          }!`,
+          [
+            {
+              text: 'Continue',
+              onPress: () => {
+                // --------------------------------
+                // If parent is controlling auth
+                // --------------------------------
+
+                if (onLoginSuccess) {
+                  onLoginSuccess(data);
+                  return;
+                }
+
+                // --------------------------------
+                // Otherwise navigate directly
+                // --------------------------------
+
+                navigation.replace('Main');
+              },
+            },
+          ],
+          {
+            cancelable: false,
+          },
         );
 
-        if (onLoginSuccess) {
-          onLoginSuccess(data);
-        }
-      } else {
+        return;
+      }
+
+
+      // =================================
+      // LOGIN FAILED
+      // =================================
+
+      if (loginUser.rejected.match(result)) {
+        const message =
+          result.payload ||
+          'Invalid email or password.';
+
         Alert.alert(
           'Login Failed',
-          data.message || 'Invalid email or password.',
+          message,
         );
       }
+
     } catch (error) {
       console.log(
         'LOGIN ERROR:',
-        error.response?.data || error.message,
+        error?.response?.data || error?.message || error,
       );
 
       Alert.alert(
         'Login Failed',
-        error.response?.data?.message ||
+        error?.response?.data?.message ||
           'Unable to connect to server.',
       );
-    } finally {
-      setLoading(false);
     }
   };
+
 
   // ======================================
   // GOOGLE LOGIN
@@ -83,7 +167,13 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
   const handleGoogleLogin = () => {
     console.log('Google Login pressed');
+
+    Alert.alert(
+      'Coming Soon',
+      'Google login will be added soon.',
+    );
   };
+
 
   // ======================================
   // APPLE LOGIN
@@ -91,7 +181,13 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
   const handleAppleLogin = () => {
     console.log('Apple Login pressed');
+
+    Alert.alert(
+      'Coming Soon',
+      'Apple login will be added soon.',
+    );
   };
+
 
   // ======================================
   // UI
@@ -100,12 +196,17 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={
+        Platform.OS === 'ios'
+          ? 'padding'
+          : undefined
+      }>
 
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
+
 
         {/* ================= HEADER ================= */}
 
@@ -129,6 +230,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         </View>
 
+
         {/* ================= EMAIL ================= */}
 
         <View style={styles.inputWrap}>
@@ -149,9 +251,11 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
             autoCorrect={false}
             value={email}
             onChangeText={setEmail}
+            editable={!loading}
           />
 
         </View>
+
 
         {/* ================= PASSWORD ================= */}
 
@@ -171,12 +275,14 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
+            editable={!loading}
           />
 
           <TouchableOpacity
             onPress={() =>
               setShowPassword(!showPassword)
             }
+            disabled={loading}
             hitSlop={{
               top: 10,
               bottom: 10,
@@ -198,10 +304,29 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         </View>
 
+
+        {/* ================= ERROR ================= */}
+
+        {authError && (
+          <View style={styles.errorBox}>
+            <Ionicons
+              name="alert-circle-outline"
+              size={18}
+              color="#D32F2F"
+            />
+
+            <Text style={styles.errorText}>
+              {authError}
+            </Text>
+          </View>
+        )}
+
+
         {/* ================= FORGOT PASSWORD ================= */}
 
         <TouchableOpacity
           style={styles.forgotWrap}
+          disabled={loading}
           onPress={() =>
             navigation.navigate('ForgotPassword')
           }>
@@ -211,6 +336,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
           </Text>
 
         </TouchableOpacity>
+
 
         {/* ================= LOGIN BUTTON ================= */}
 
@@ -223,10 +349,18 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
           disabled={loading}>
 
           {loading ? (
-            <ActivityIndicator
-              size="small"
-              color={Colors.textInverse}
-            />
+            <View style={styles.loadingContent}>
+
+              <ActivityIndicator
+                size="small"
+                color={Colors.textInverse}
+              />
+
+              <Text style={styles.loginButtonText}>
+                Logging in...
+              </Text>
+
+            </View>
           ) : (
             <Text style={styles.loginButtonText}>
               Log In
@@ -234,6 +368,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
           )}
 
         </TouchableOpacity>
+
 
         {/* ================= DIVIDER ================= */}
 
@@ -249,6 +384,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         </View>
 
+
         {/* ================= GOOGLE ================= */}
 
         <TouchableOpacity
@@ -256,6 +392,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
             styles.socialButton,
             styles.googleButton,
           ]}
+          disabled={loading}
           onPress={handleGoogleLogin}>
 
           <Ionicons
@@ -271,6 +408,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         </TouchableOpacity>
 
+
         {/* ================= APPLE ================= */}
 
         <TouchableOpacity
@@ -278,6 +416,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
             styles.socialButton,
             styles.appleButton,
           ]}
+          disabled={loading}
           onPress={handleAppleLogin}>
 
           <Ionicons
@@ -301,6 +440,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         </TouchableOpacity>
 
+
         {/* ================= SIGN UP ================= */}
 
         <View style={styles.footer}>
@@ -310,6 +450,7 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
           </Text>
 
           <TouchableOpacity
+            disabled={loading}
             onPress={() =>
               navigation.navigate('Signup')
             }>
@@ -322,13 +463,16 @@ const LoginScreen = ({navigation, onLoginSuccess}) => {
 
         </View>
 
+
       </ScrollView>
 
     </KeyboardAvoidingView>
   );
 };
 
+
 export default LoginScreen;
+
 
 // ======================================================
 // STYLES
@@ -398,6 +542,26 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEBEE',
+    borderWidth: 1,
+    borderColor: '#FFCDD2',
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    marginBottom: Spacing.md,
+  },
+
+  errorText: {
+    flex: 1,
+    marginLeft: 8,
+    color: '#D32F2F',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
   forgotWrap: {
     alignSelf: 'flex-end',
     marginBottom: Spacing.lg,
@@ -422,13 +586,21 @@ const styles = StyleSheet.create({
       width: 0,
       height: 4,
     },
+
     shadowOpacity: 0.25,
     shadowRadius: 8,
+
     elevation: 3,
   },
 
   disabledButton: {
     opacity: 0.7,
+  },
+
+  loadingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
 
   loginButtonText: {

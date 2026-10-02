@@ -10,7 +10,7 @@ import {
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import HomeScreen from '../screens/home/Home';
+import HomeScreen from '../screens/Home/HomeScreen';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';

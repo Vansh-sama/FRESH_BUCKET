@@ -2,44 +2,67 @@ import React, {
   createContext,
   useContext,
   useState,
+  useCallback,
 } from 'react';
 
-// Stores placed orders in memory so "My Orders" / "Track Orders" have
-// something real to show. CheckoutScreen should call placeOrder(...)
-// BEFORE clearCart() runs, or the order will have no items in it.
+import {
+  createOrderApi,
+  getOrdersApi,
+  getOrderApi,
+} from '../services/catalogService';
 
 const OrdersContext = createContext(undefined);
 
 export const OrdersProvider = ({children}) => {
   const [orders, setOrders] = useState([]);
 
-  // Call this from CheckoutScreen's handlePlaceOrder, passing the cart
-  // items and total BEFORE clearCart() wipes them.
-  const placeOrder = ({items, subtotal, address}) => {
-    const order = {
-      id: `ORD-${Date.now()}`,
-      items,
-      subtotal,
+  const loadOrders = useCallback(async () => {
+    const data = await getOrdersApi();
+    setOrders(data);
+    return data;
+  }, []);
+
+  const placeOrder = async ({
+    items,
+    address,
+    paymentMethod,
+  }) => {
+    const order = await createOrderApi({
+      items: items.map(item => ({
+        productId: item.id || item._id,
+        quantity: item.quantityCount,
+      })),
       address,
-      status: 'placed', // placed -> preparing -> out_for_delivery -> delivered
-      placedAt: new Date().toISOString(),
-    };
+      paymentMethod,
+    });
 
     setOrders(prev => [order, ...prev]);
     return order;
   };
 
-  const updateOrderStatus = (orderId, status) => {
-    setOrders(prev =>
-      prev.map(o => (o.id === orderId ? {...o, status} : o)),
+  const getOrderById = async orderId => {
+    const local = orders.find(
+      o => String(o.id) === String(orderId),
     );
+
+    if (local) return local;
+
+    try {
+      return await getOrderApi(orderId);
+    } catch (error) {
+      console.log('ORDER API ERROR:', error?.response?.data || error?.message);
+      return null;
+    }
   };
 
-  const getOrderById = orderId =>
-    orders.find(o => o.id === orderId);
+  const updateOrderStatus = () => {
+    // Status is controlled by the backend/admin.
+    // The mobile app does not fake or auto-advance it.
+  };
 
   const value = {
     orders,
+    loadOrders,
     placeOrder,
     updateOrderStatus,
     getOrderById,

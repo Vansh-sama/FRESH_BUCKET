@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 import ProductCard from '../../components/home/ProductCard';
-import products from '../../data/products';
+import {getProductsApi} from '../../services/catalogService';
 
 import {useCart} from '../../context/CartContext';
 
@@ -33,6 +33,7 @@ const ProductDetailScreen = ({navigation, route}) => {
 
   const [qty, setQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   const addedPulse = useRef(new Animated.Value(1)).current;
 
@@ -94,19 +95,28 @@ const ProductDetailScreen = ({navigation, route}) => {
   const increment = () => setQty(q => q + 1);
   const decrement = () => setQty(q => Math.max(1, q - 1));
 
-  // "You may also like" — other products excluding the current one.
-  // Your products.js doesn't have a category field yet, so this is a
-  // simple exclude-current selection rather than true category
-  // matching; swap this for a category filter once that field exists.
-  const relatedProducts = products
-    .filter(p => p.id !== product.id)
-    .slice(0, 6);
+  useEffect(() => {
+    getProductsApi({
+      category: product.categoryId,
+      limit: 20,
+    })
+      .then(result =>
+        setRelatedProducts(
+          result.products
+            .filter(p => String(p.id) !== String(product.id))
+            .slice(0, 6),
+        ),
+      )
+      .catch(error =>
+        console.log('RELATED PRODUCTS API ERROR:', error?.response?.data || error?.message),
+      );
+  }, [product.categoryId, product.id]);
 
   // rating/delivery time aren't in your product data yet — defaulted
   // here so the row always has something to show. Replace with real
   // fields (product.rating, product.deliveryTime) once you add them.
-  const rating = product.rating ?? 4.5;
-  const deliveryTime = product.deliveryTime ?? '15-20 mins';
+  const rating = product.rating ?? 0;
+  const deliveryTime = product.deliveryTime || '';
 
   const handleAddToCart = () => {
     addToCart(product, qty);

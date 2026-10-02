@@ -2,6 +2,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import BottomNavigator from './BottomNavigator';
+
 import ProductListingScreen from '../screens/ProductListing/ProductListingScreen';
 import ProductDetailScreen from '../screens/Product/ProductDetailScreen';
 import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
@@ -14,17 +15,53 @@ const Stack = createNativeStackNavigator();
 const MainStack = () => {
   return (
     <Stack.Navigator
+      initialRouteName="Tabs"
       screenOptions={{
         headerShown: false,
       }}>
 
-      <Stack.Screen name="Tabs" component={BottomNavigator} />
-      <Stack.Screen name="ProductListing" component={ProductListingScreen} />
-      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-      <Stack.Screen name="Checkout" component={CheckoutScreen} />
-      <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
-      <Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
-      <Stack.Screen name="MyOrders" component={MyOrdersScreen} />
+      {/* ================= BOTTOM TABS ================= */}
+
+      <Stack.Screen
+        name="Tabs"
+        component={BottomNavigator}
+      />
+
+      {/* ================= PRODUCTS ================= */}
+
+      <Stack.Screen
+        name="ProductListing"
+        component={ProductListingScreen}
+      />
+
+      <Stack.Screen
+        name="ProductDetail"
+        component={ProductDetailScreen}
+      />
+
+      {/* ================= CHECKOUT ================= */}
+
+      <Stack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+      />
+
+      {/* ================= ORDERS ================= */}
+
+      <Stack.Screen
+        name="OrderSuccess"
+        component={OrderSuccessScreen}
+      />
+
+      <Stack.Screen
+        name="OrderTracking"
+        component={OrderTrackingScreen}
+      />
+
+      <Stack.Screen
+        name="MyOrders"
+        component={MyOrdersScreen}
+      />
 
     </Stack.Navigator>
   );

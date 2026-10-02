@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import {useDispatch} from 'react-redux';
+import {registerUser} from '../../redux/slices/authSlice';
 import {
   View,
   Text,
@@ -16,6 +18,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {Colors, Spacing, Typography, Radius, Shadows, Sizes} from '../../theme';
 
 const SignupScreen = ({navigation}) => {
+  const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +27,7 @@ const SignupScreen = ({navigation}) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!name.trim() || !email.trim() || !password || !confirmPassword) {
       setError('Please fill in all fields');
       return;
@@ -33,10 +36,22 @@ const SignupScreen = ({navigation}) => {
       setError('Passwords do not match');
       return;
     }
+
     setError('');
-    // NOTE: 'Login' is not a registered route in AppNavigator (only
-    // Splash, Onboarding, Signup, Main exist) — this must point at 'Main'.
-    navigation.replace('Main');
+
+    const result = await dispatch(
+      registerUser({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+      }),
+    );
+
+    if (registerUser.fulfilled.match(result)) {
+      navigation.replace('Main');
+    } else {
+      setError(result.payload || 'Registration failed.');
+    }
   };
 
   return (

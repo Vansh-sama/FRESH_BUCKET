@@ -1,22 +1,45 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import {CartProvider} from './src/context/CartContext';
-import {AddressProvider} from './src/context/AddressContext';
+import SplashScreen from '../screens/Splash/SplashScreen';
+import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
+import AuthStack from './AuthStack';
+import MainStack from './MainStack';
 
-import AppNavigator from './src/navigation/AppNavigator';
+const Stack = createNativeStackNavigator();
 
-export default function App() {
+const AppNavigator = () => {
   return (
-    <SafeAreaProvider>
-      <CartProvider>
-        <AddressProvider>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </AddressProvider>
-      </CartProvider>
-    </SafeAreaProvider>
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+      />
+
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+      />
+
+      <Stack.Screen
+        name="Auth"
+        component={AuthStack}
+      />
+
+      <Stack.Screen
+        name="Main"
+        component={MainStack}
+        options={{
+          gestureEnabled: false,
+        }}
+      />
+    </Stack.Navigator>
   );
-}
+};
+
+export default AppNavigator;

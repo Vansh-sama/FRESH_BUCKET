@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {
   View,
@@ -18,10 +18,9 @@ import LocationCard from '../../components/home/LocationCard';
 import OfferBanner from '../../components/home/OfferBanner';
 import CategoryCard from '../../components/home/CategoryCard';
 import ProductCard from '../../components/home/ProductCard';
-import DrawerMenu from '../../components/navigation/DrawerMenu.jsx';
+//import DrawerMenu from '../../components/navigation/DrawerMenu.jsx';
 
-import categories from '../../data/categories';
-import products from '../../data/products';
+import {getCategoriesApi, getProductsApi} from '../../services/catalogService';
 
 import {useCart} from '../../context/CartContext';
 
@@ -33,6 +32,24 @@ import {
 const HomeScreen = ({navigation}) => {
   const [search, setSearch] = useState('');
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [categoryData, productData] = await Promise.all([
+          getCategoriesApi(),
+          getProductsApi({limit: 50}),
+        ]);
+        setCategories(categoryData);
+        setProducts(productData.products);
+      } catch (error) {
+        console.log('HOME API ERROR:', error?.response?.data || error?.message);
+      }
+    };
+    load();
+  }, []);
 
   const {addToCart} = useCart();
 

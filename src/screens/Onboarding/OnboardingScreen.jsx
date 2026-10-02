@@ -114,7 +114,9 @@ const OnboardingScreen = ({navigation}) => {
 
   const handleNext = () => {
     if (isLastSlide) {
-      navigation.replace('Signup');
+      navigation.replace('Auth', {
+  screen: 'Signup',
+});
       return;
     }
 
@@ -125,7 +127,9 @@ const OnboardingScreen = ({navigation}) => {
   };
 
   const handleSkip = () => {
-    navigation.replace('Signup');
+    navigation.replace('Auth', {
+  screen: 'Signup',
+});
   };
 
   const blobOneTranslateY = blobOneFloat.interpolate({
