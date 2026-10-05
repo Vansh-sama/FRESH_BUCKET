@@ -18,8 +18,7 @@ import {
   Colors,
   Typography,
 }from '../../theme';
-
-git add const ProfileScreen = ({navigation, route}) => {
+const ProfileScreen = ({navigation, route}) => {
   const user = route?.params?.user ?? null;
   const isGuest = !user;
 
