@@ -2,24 +2,24 @@ export const onboardingData = [
   {
     id: '1',
     image: require('../assets/images/onboarding/grocery.png'),
-    title: 'Fresh Groceries',
+    title: 'Everything You Need',
     description:
-      'Shop fresh fruits, vegetables, dairy and everyday essentials from one place.',
+      'Fresh groceries and daily essentials, all in one place.',
   },
 
   {
     id: '2',
     image: require('../assets/images/onboarding/delivery.png'),
-    title: 'Fast Delivery',
+    title: 'Delivered Fresh & Fast',
     description:
-      'Get your groceries delivered quickly and conveniently right to your doorstep.',
+      'Get your everyday essentials delivered right to your doorstep.',
   },
 
   {
     id: '3',
     image: require('../assets/images/onboarding/tracking.png'),
-    title: 'Track Your Order',
+    title: 'Know Where Your Order Is',
     description:
-      'Stay updated with your order and know exactly when your groceries will arrive.',
+      'Track your delivery from store to doorstep.',
   },
 ];

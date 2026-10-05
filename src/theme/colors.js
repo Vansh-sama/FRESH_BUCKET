@@ -1,39 +1,83 @@
 const Colors = {
-  // Brand
+  // ==========================================
+  // BRAND
+  // ==========================================
+
   primary: '#2E7D32',
-  primaryLight: '#4CAF50',
   primaryDark: '#1B5E20',
-  primarySoft: '#DCF2E1',
+  primaryDarker: '#145A1A',
+  primaryLight: '#43A047',
+  primarySoft: '#E8F5E9',
+  primaryMuted: '#C8E6C9',
 
-  // Onboarding
-  onboardingBg: '#F2FAF1',
+  // ==========================================
+  // ACCENTS
+  // ==========================================
 
-  // Accent
   secondary: '#FFB300',
-  accent: '#FF6B35',
+  secondaryLight: '#FFF3CD',
 
-  // Backgrounds
-  background: '#F8F7F3',
+  accent: '#FF6B35',
+  accentLight: '#FFF0EA',
+
+  lime: '#8BC34A',
+  limeLight: '#F1F8E9',
+
+  // ==========================================
+  // BACKGROUNDS
+  // ==========================================
+
+  background: '#F7F9F4',
+  backgroundGreen: '#F2FAF1',
+
   surface: '#FFFFFF',
   card: '#FFFFFF',
 
-  // Text
+  // ==========================================
+  // TEXT
+  // ==========================================
+
   text: '#18261D',
+  textPrimary: '#18261D',
+
   textSecondary: '#64748B',
+  textMuted: '#7A8A80',
   textLight: '#94A3B8',
+
   white: '#FFFFFF',
-
-  // Borders
-  border: '#E5E7EB',
-  divider: '#E9EDE9',
-
-  // Status
-  success: '#22C55E',
-  warning: '#F59E0B',
-  error: '#EF4444',
-  info: '#3B82F6',
-
   black: '#000000',
+
+  // ==========================================
+  // BORDERS / DIVIDERS
+  // ==========================================
+
+  border: '#E4EAE4',
+  borderLight: '#EEF2EE',
+  divider: '#E8EDE8',
+
+  // ==========================================
+  // STATUS
+  // ==========================================
+
+  success: '#22C55E',
+  successSoft: '#EAF8EF',
+
+  warning: '#F59E0B',
+  warningSoft: '#FFF7E6',
+
+  error: '#EF4444',
+  errorSoft: '#FDECEC',
+
+  info: '#3B82F6',
+  infoSoft: '#EBF3FF',
+
+  // ==========================================
+  // SPECIAL
+  // ==========================================
+
+  overlay: 'rgba(24, 38, 29, 0.45)',
+  shadow: 'rgba(24, 38, 29, 0.10)',
+
   transparent: 'transparent',
 };
 

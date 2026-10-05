@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {Colors, Spacing, Radius, Typography} from '../theme';
+import {Colors, Spacing, Radius, Typography} from '../../theme';
 
 // Presentational only - the parent screen owns the value/state and
 // decides what happens on submit/filter press. Keeps this reusable

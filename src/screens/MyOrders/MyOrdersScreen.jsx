@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 import {useOrders} from '../../context/OrdersContext';
-import {Colors, Typography} from '../../theme';
+import {Colors, Typography}from '../../theme';
 
 const STATUS_LABEL = {
   placed: 'Order Placed',

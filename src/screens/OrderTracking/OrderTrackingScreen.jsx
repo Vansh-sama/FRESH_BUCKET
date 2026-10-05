@@ -15,7 +15,7 @@ import {
   Colors,
   Typography,
   Sizes,
-} from '../../theme';
+}from '../../theme';
 
 const STEPS = [
   {

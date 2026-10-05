@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {Colors, Spacing, Typography} from '../theme';
+import {Colors, Spacing, Typography} from '../../theme';
 
 // Used above every horizontal list / grid on Home (Categories, Popular
 // Products, Deals) so that pattern only has to be built once.

@@ -18,7 +18,7 @@ import {useCart} from '../../context/CartContext';
 import {
   Colors,
   Typography,
-} from '../../theme';
+}from '../../theme';
 
 const CartScreen = ({navigation}) => {
   // Cart now comes from shared context — starts empty, and only

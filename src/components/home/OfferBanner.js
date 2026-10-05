@@ -9,7 +9,7 @@ import {
 
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-import {Colors, Typography, Radius} from '../../theme';
+import {Colors, Typography, Radius}from '../../theme';
 
 const OfferBanner = () => {
   return (

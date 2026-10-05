@@ -10,7 +10,7 @@ import {
 
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-import {Colors, Typography} from '../../theme';
+import {Colors, Typography}from '../../theme';
 import {useAddress} from '../../context/AddressContext';
 
 const LocationCard = () => {

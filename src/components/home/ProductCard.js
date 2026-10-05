@@ -1,128 +1,331 @@
 import React from 'react';
+
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
+  Image,
   StyleSheet,
 } from 'react-native';
 
 import Ionicons from '@react-native-vector-icons/ionicons';
 
-import {Colors, Typography} from '../../theme';
+import {
+  Colors,
+  Typography,
+  Radius,
+  Spacing,
+  Shadows,
+}from '../../theme';
 
-const ProductCard = ({item, onAdd}) => {
+
+const ProductCard = ({
+  product,
+  onPress,
+  onAddPress,
+}) => {
+
+  if (!product) {
+    return null;
+  }
+
+  const {
+    name,
+    unit,
+    price,
+    originalPrice,
+    icon,
+    color,
+    rating,
+    image,
+  } = product;
+
+  const hasDiscount =
+    originalPrice &&
+    originalPrice > price;
+
+  const discountPercentage = hasDiscount
+    ? Math.round(
+        100 - (price / originalPrice) * 100,
+      )
+    : 0;
+
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.88}
+      onPress={onPress}>
 
-      <View style={styles.imageContainer}>
-        <Image
-          source={item.image}
-          style={styles.image}
-          resizeMode="contain"
-        />
-      </View>
+      {/* PRODUCT IMAGE */}
 
-      <Text style={styles.name} numberOfLines={1}>
-        {item.name}
-      </Text>
+      <View
+        style={[
+          styles.imageWrap,
+          {
+            backgroundColor:
+              color || Colors.primarySoft,
+          },
+        ]}>
 
-      <Text style={styles.quantity}>
-        {item.quantity}
-      </Text>
+        {hasDiscount && (
+          <View style={styles.discountBadge}>
 
-      <View style={styles.bottom}>
+            <Text style={styles.discountText}>
+              {discountPercentage}% OFF
+            </Text>
 
-        <Text style={styles.price}>
-          ₹{item.price}
-          <Text style={styles.unit}>
-            {' '} /kg
-          </Text>
-        </Text>
+          </View>
+        )}
+
 
         <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => onAdd?.(item)}
-          activeOpacity={0.8}>
+          style={styles.favoriteButton}
+          activeOpacity={0.7}
+          onPress={() => {}}>
 
           <Ionicons
-            name="add"
-            size={21}
-            color={Colors.white}
+            name="heart-outline"
+            size={16}
+            color={Colors.text}
           />
 
         </TouchableOpacity>
 
+
+        {image ? (
+          <Image
+            source={image}
+            style={styles.productImage}
+            resizeMode="contain"
+          />
+        ) : (
+          <Ionicons
+            name={icon || 'basket-outline'}
+            size={44}
+            color={Colors.primaryDark}
+          />
+        )}
+
       </View>
 
-    </View>
+
+      {/* PRODUCT INFO */}
+
+      <View style={styles.info}>
+
+        {rating ? (
+          <View style={styles.ratingRow}>
+
+            <Ionicons
+              name="star"
+              size={11}
+              color={Colors.warning}
+            />
+
+            <Text style={styles.ratingText}>
+              {rating}
+            </Text>
+
+          </View>
+        ) : null}
+
+
+        <Text
+          style={styles.name}
+          numberOfLines={1}>
+
+          {name}
+
+        </Text>
+
+
+        {unit ? (
+          <Text style={styles.unit}>
+            {unit}
+          </Text>
+        ) : null}
+
+
+        {/* PRICE + ADD */}
+
+        <View style={styles.bottomRow}>
+
+          <View style={styles.priceContainer}>
+
+            <Text style={styles.price}>
+              ₹{price}
+            </Text>
+
+            {hasDiscount && (
+              <Text style={styles.originalPrice}>
+                ₹{originalPrice}
+              </Text>
+            )}
+
+          </View>
+
+
+          <TouchableOpacity
+            style={styles.addButton}
+            activeOpacity={0.8}
+            onPress={onAddPress}>
+
+            <Ionicons
+              name="add"
+              size={20}
+              color={Colors.white}
+            />
+
+          </TouchableOpacity>
+
+        </View>
+
+      </View>
+
+    </TouchableOpacity>
   );
 };
 
+
 export default ProductCard;
 
+
 const styles = StyleSheet.create({
-  container: {
-    width: 137,
-    height: 178,
+
+  card: {
+    width: 156,
     backgroundColor: Colors.surface,
-    borderRadius: 17,
+    borderRadius: Radius.lg,
+    marginRight: Spacing.md,
     borderWidth: 1,
-    borderColor: '#E0E7E2',
-    padding: 10,
-    marginRight: 12,
+    borderColor: Colors.border,
+    overflow: 'hidden',
+    ...Shadows.small,
   },
 
-  imageContainer: {
-    height: 94,
-    width: '100%',
+
+  imageWrap: {
+    height: 132,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
 
-  image: {
+
+  productImage: {
     width: 105,
-    height: 90,
+    height: 105,
   },
+
+
+  discountBadge: {
+    position: 'absolute',
+    top: 9,
+    left: 9,
+    backgroundColor: Colors.accent,
+    borderRadius: Radius.sm,
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    zIndex: 2,
+  },
+
+
+  discountText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: Colors.white,
+  },
+
+
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 29,
+    height: 29,
+    borderRadius: 15,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 3,
+  },
+
+
+  info: {
+    paddingHorizontal: 11,
+    paddingTop: 9,
+    paddingBottom: 11,
+  },
+
+
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 3,
+  },
+
+
+  ratingText: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    fontWeight: '600',
+    marginLeft: 3,
+  },
+
 
   name: {
-    ...Typography.bodySmall,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
     color: Colors.text,
-    marginTop: 3,
   },
 
-  quantity: {
-    ...Typography.caption,
+
+  unit: {
+    fontSize: 11,
     color: Colors.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
+    marginBottom: 8,
   },
 
-  bottom: {
-    flex: 1,
+
+  bottomRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
+
+
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    flex: 1,
+  },
+
 
   price: {
     fontSize: 15,
     fontWeight: '900',
-    color: Colors.primary,
+    color: Colors.text,
   },
 
-  unit: {
-    fontSize: 11,
-    fontWeight: '600',
+
+  originalPrice: {
+    fontSize: 10,
+    color: Colors.textLight,
+    textDecorationLine: 'line-through',
+    marginLeft: 5,
   },
+
 
   addButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 11,
     backgroundColor: Colors.primary,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
+
 });

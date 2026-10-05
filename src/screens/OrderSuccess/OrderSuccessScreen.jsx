@@ -16,7 +16,7 @@ import {
   Colors,
   Typography,
   Sizes,
-} from '../../theme';
+}from '../../theme';
 
 // Shown right after Checkout's "Place Order" — matches the
 // checkmark + "Track My Order" / "Go Back" pattern used across most

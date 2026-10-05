@@ -1,19 +1,59 @@
 const Sizes = {
+  // ==========================================
+  // ICONS
+  // ==========================================
+
+  iconTiny: 14,
   iconSmall: 18,
-  icon: 24,
-  iconLarge: 32,
+  icon: 22,
+  iconLarge: 28,
+  iconXLarge: 34,
 
-  buttonHeight: 56,
+  // ==========================================
+  // BUTTONS
+  // ==========================================
 
-  inputHeight: 56,
+  buttonHeight: 48,
+  buttonHeightLarge: 52,
+  buttonHeightSmall: 40,
 
-  headerHeight: 70,
+  // ==========================================
+  // INPUTS
+  // ==========================================
 
-  bannerHeight: 180,
+  inputHeight: 52,
+
+  // ==========================================
+  // NAVIGATION
+  // ==========================================
+
+  headerHeight: 64,
+  bottomTabHeight: 64,
+
+  // ==========================================
+  // IMAGES
+  // ==========================================
 
   productImage: 120,
+  productImageSmall: 90,
+  productImageLarge: 180,
+
+  categoryImage: 64,
+
+  // ==========================================
+  // PROFILE
+  // ==========================================
 
   profile: 46,
+  profileLarge: 72,
+
+  // ==========================================
+  // OTHER
+  // ==========================================
+
+  avatar: 40,
+  badge: 18,
+  divider: 1,
 };
 
 export default Sizes;

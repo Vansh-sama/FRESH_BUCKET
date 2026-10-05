@@ -13,7 +13,7 @@ import {
   Colors,
   Typography,
   Spacing,
-} from '../../theme';
+}from '../../theme';
 
 const Header = ({onMenuPress, onNotificationPress}) => {
   return (

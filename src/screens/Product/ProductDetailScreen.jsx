@@ -22,7 +22,7 @@ import {
   Colors,
   Typography,
   Sizes,
-} from '../../theme';
+}from '../../theme';
 
 const ProductDetailScreen = ({navigation, route}) => {
   // Product comes from route.params (passed by ProductCard's onPress

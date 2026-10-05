@@ -17,9 +17,9 @@ import {useOrders} from '../../context/OrdersContext';
 import {
   Colors,
   Typography,
-} from '../../theme';
+}from '../../theme';
 
-const ProfileScreen = ({navigation, route}) => {
+git add const ProfileScreen = ({navigation, route}) => {
   const user = route?.params?.user ?? null;
   const isGuest = !user;
 

@@ -14,206 +14,446 @@ import {
   Colors,
   Spacing,
   Typography,
-} from '../../theme';
+  Radius,
+}from '../../theme';
 
 const {width} = Dimensions.get('window');
 
-const CIRCLE_SIZE = Math.min(width * 0.72, 300);
+const IMAGE_SIZE = Math.min(width * 0.86, 350);
 
-const OnboardingItem = ({item}) => {
+const OnboardingItem = ({item, isActive}) => {
+  const imageOpacity = useRef(new Animated.Value(0)).current;
+  const imageScale = useRef(new Animated.Value(0.94)).current;
+  const imageTranslateY = useRef(new Animated.Value(18)).current;
 
-  // Subtle breathing scale on the illustration — small, slow, loops
-  // continuously to keep the slide feeling alive rather than static.
-  const breathe = useRef(new Animated.Value(0)).current;
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslateY = useRef(new Animated.Value(14)).current;
+
+  const descriptionOpacity = useRef(new Animated.Value(0)).current;
+  const descriptionTranslateY = useRef(new Animated.Value(12)).current;
+
+  const floatAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const loop = Animated.loop(
+    if (!isActive) {
+      return;
+    }
+
+    imageOpacity.setValue(0);
+    imageScale.setValue(0.94);
+    imageTranslateY.setValue(18);
+
+    titleOpacity.setValue(0);
+    titleTranslateY.setValue(14);
+
+    descriptionOpacity.setValue(0);
+    descriptionTranslateY.setValue(12);
+
+    const entranceAnimation = Animated.parallel([
+      Animated.timing(imageOpacity, {
+        toValue: 1,
+        duration: 420,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+
+      Animated.spring(imageScale, {
+        toValue: 1,
+        friction: 7,
+        tension: 50,
+        useNativeDriver: true,
+      }),
+
+      Animated.timing(imageTranslateY, {
+        toValue: 0,
+        duration: 420,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+
+      Animated.timing(titleOpacity, {
+        toValue: 1,
+        duration: 350,
+        delay: 120,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+
+      Animated.timing(titleTranslateY, {
+        toValue: 0,
+        duration: 350,
+        delay: 120,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+
+      Animated.timing(descriptionOpacity, {
+        toValue: 1,
+        duration: 350,
+        delay: 190,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+
+      Animated.timing(descriptionTranslateY, {
+        toValue: 0,
+        duration: 350,
+        delay: 190,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]);
+
+    entranceAnimation.start();
+
+    const floatingAnimation = Animated.loop(
       Animated.sequence([
-        Animated.timing(breathe, {
+        Animated.timing(floatAnimation, {
           toValue: 1,
-          duration: 1800,
+          duration: 1900,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-        Animated.timing(breathe, {
+
+        Animated.timing(floatAnimation, {
           toValue: 0,
-          duration: 1800,
+          duration: 1900,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
       ]),
     );
-    loop.start();
-    return () => loop.stop();
-  }, [breathe]);
 
-  const imageScale = breathe.interpolate({
+    floatingAnimation.start();
+
+    return () => {
+      entranceAnimation.stop();
+      floatingAnimation.stop();
+    };
+  }, [
+    isActive,
+    imageOpacity,
+    imageScale,
+    imageTranslateY,
+    titleOpacity,
+    titleTranslateY,
+    descriptionOpacity,
+    descriptionTranslateY,
+    floatAnimation,
+  ]);
+
+  const floatingY = floatAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.035],
+    outputRange: [0, -6],
   });
 
   return (
     <View style={styles.container}>
 
-      {/* IMAGE — now large enough to fill most of the circle backdrop
-          instead of floating small inside it; backdrop shows as a thin
-          glow ring around the illustration rather than empty space. */}
-      <View style={styles.imageStack}>
+      {/* =================================================
+          ILLUSTRATION
+      ================================================= */}
 
-        <View style={styles.outerRing} />
-        <View style={styles.innerCircle} />
+      <View style={styles.illustrationArea}>
 
-        <View style={[styles.accentDot, styles.accentDotOne]} />
-        <View style={[styles.accentDot, styles.accentDotTwo]} />
-        <View style={[styles.accentDot, styles.accentDotThree]} />
+        {/* Soft visual background */}
+
+        <View style={styles.softCircle} />
+
+        <View style={styles.softCircleSmall} />
+
+        {/* Small decorative accents */}
+
+        <View
+          style={[
+            styles.accent,
+            styles.accentTopRight,
+          ]}
+        />
+
+        <View
+          style={[
+            styles.accent,
+            styles.accentBottomLeft,
+          ]}
+        />
+
+        {/* Main illustration */}
 
         <Animated.View
           style={[
             styles.imageWrapper,
-            {transform: [{scale: imageScale}]},
+            {
+              opacity: imageOpacity,
+
+              transform: [
+                {scale: imageScale},
+                {
+                  translateY:
+                    Animated.add(
+                      imageTranslateY,
+                      floatingY,
+                    ),
+                },
+              ],
+            },
           ]}>
+
           <Image
             source={item.image}
             style={styles.image}
             resizeMode="contain"
           />
+
         </Animated.View>
 
       </View>
 
-      {/* TEXT */}
-      <View style={styles.textContainer}>
+
+      {/* =================================================
+          TEXT
+      ================================================= */}
+
+      <Animated.View
+        style={[
+          styles.textArea,
+          {
+            opacity: titleOpacity,
+
+            transform: [
+              {translateY: titleTranslateY},
+            ],
+          },
+        ]}>
+
+        <View style={styles.titleAccent} />
 
         <Text style={styles.title}>
           {item.title}
         </Text>
 
-        <View style={styles.titleUnderline} />
+      </Animated.View>
+
+
+      <Animated.View
+        style={[
+          styles.descriptionWrapper,
+          {
+            opacity: descriptionOpacity,
+
+            transform: [
+              {translateY: descriptionTranslateY},
+            ],
+          },
+        ]}>
 
         <Text style={styles.description}>
           {item.description}
         </Text>
 
-      </View>
+      </Animated.View>
+
     </View>
   );
 };
 
 export default OnboardingItem;
 
-export {CIRCLE_SIZE};
+export {IMAGE_SIZE};
+
 
 const styles = StyleSheet.create({
+
+  /*
+   * ========================================================
+   * CONTAINER
+   * ========================================================
+   */
+
   container: {
     width,
-    height: '100%',
+
     alignItems: 'center',
-    justifyContent: 'flex-start',
+
     paddingHorizontal: Spacing.xxl,
   },
 
-  imageStack: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
+
+  /*
+   * ========================================================
+   * ILLUSTRATION
+   * ========================================================
+   */
+
+  illustrationArea: {
+    width: IMAGE_SIZE,
+
+    height: IMAGE_SIZE,
+
     alignItems: 'center',
+
     justifyContent: 'center',
+
+    position: 'relative',
   },
 
-  outerRing: {
+  softCircle: {
     position: 'absolute',
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
-    borderRadius: CIRCLE_SIZE / 2,
-    backgroundColor: 'rgba(46,125,50,0.06)',
+
+    width: IMAGE_SIZE * 0.78,
+
+    height: IMAGE_SIZE * 0.78,
+
+    borderRadius: IMAGE_SIZE,
+
+    backgroundColor: 'rgba(255,255,255,0.72)',
   },
 
-  innerCircle: {
+  softCircleSmall: {
     position: 'absolute',
-    width: CIRCLE_SIZE * 0.9,
-    height: CIRCLE_SIZE * 0.9,
-    borderRadius: (CIRCLE_SIZE * 0.9) / 2,
-    backgroundColor: Colors.primarySoft,
+
+    width: IMAGE_SIZE * 0.62,
+
+    height: IMAGE_SIZE * 0.62,
+
+    borderRadius: IMAGE_SIZE,
+
+    backgroundColor: 'rgba(220,242,225,0.42)',
   },
 
-  accentDot: {
-    position: 'absolute',
-    borderRadius: 999,
-  },
-
-  accentDotOne: {
-    width: 16,
-    height: 16,
-    backgroundColor: Colors.secondary,
-    top: 2,
-    right: 12,
-  },
-
-  accentDotTwo: {
-    width: 11,
-    height: 11,
-    backgroundColor: Colors.primaryLight,
-    bottom: 14,
-    left: -2,
-  },
-
-  accentDotThree: {
-    width: 8,
-    height: 8,
-    backgroundColor: Colors.accent,
-    top: 40,
-    left: -8,
-  },
-
-  // Image now spans nearly the full circle (was 0.62 -> 0.94), so the
-  // illustration is the star of the slide instead of the backdrop.
   imageWrapper: {
-    width: CIRCLE_SIZE * 0.94,
-    height: CIRCLE_SIZE * 0.94,
+    width: IMAGE_SIZE,
+
+    height: IMAGE_SIZE,
+
     alignItems: 'center',
+
     justifyContent: 'center',
 
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: {width: 0, height: 6},
+    zIndex: 5,
   },
 
   image: {
     width: '100%',
+
     height: '100%',
   },
 
-  textContainer: {
-    width: '100%',
+
+  /*
+   * ========================================================
+   * DECORATIVE ACCENTS
+   * ========================================================
+   */
+
+  accent: {
+    position: 'absolute',
+
+    borderRadius: 999,
+
+    zIndex: 2,
+  },
+
+  accentTopRight: {
+    width: 12,
+
+    height: 12,
+
+    backgroundColor: Colors.secondary,
+
+    top: IMAGE_SIZE * 0.16,
+
+    right: IMAGE_SIZE * 0.06,
+  },
+
+  accentBottomLeft: {
+    width: 9,
+
+    height: 9,
+
+    backgroundColor: Colors.primaryLight,
+
+    bottom: IMAGE_SIZE * 0.18,
+
+    left: IMAGE_SIZE * 0.04,
+  },
+
+
+  /*
+   * ========================================================
+   * TITLE
+   * ========================================================
+   */
+
+  textArea: {
+    flexDirection: 'row',
+
     alignItems: 'center',
-    marginTop: 22,
+
+    justifyContent: 'center',
+
+    paddingHorizontal: Spacing.md,
+
+    marginTop: 2,
+  },
+
+  titleAccent: {
+    width: 4,
+
+    height: 25,
+
+    borderRadius: Radius.pill,
+
+    backgroundColor: Colors.primary,
+
+    marginRight: 10,
   },
 
   title: {
     ...Typography.h2,
-    fontSize: 23,
-    lineHeight: 29,
+
+    fontSize: 24,
+
+    lineHeight: 30,
+
+    fontWeight: '800',
+
     color: Colors.text,
+
     textAlign: 'center',
-    fontWeight: '700',
+
+    letterSpacing: -0.35,
   },
 
-  titleUnderline: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.primary,
-    marginTop: 10,
+
+  /*
+   * ========================================================
+   * DESCRIPTION
+   * ========================================================
+   */
+
+  descriptionWrapper: {
+    width: '100%',
+
+    alignItems: 'center',
+
+    marginTop: 11,
+
+    paddingHorizontal: 4,
   },
 
   description: {
     ...Typography.body,
+
     fontSize: 14,
+
     lineHeight: 21,
-    marginTop: 14,
+
     color: Colors.textSecondary,
+
     textAlign: 'center',
-    maxWidth: width - 80,
+
+    maxWidth: width - 78,
   },
+
 });

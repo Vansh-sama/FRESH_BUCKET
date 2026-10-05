@@ -20,7 +20,7 @@ import categories from '../../data/categories';
 import {
   Colors,
   Typography,
-} from '../../theme';
+}from '../../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SIDEBAR_WIDTH = 110;

@@ -20,7 +20,7 @@ import {useCart} from '../../context/CartContext';
 import {
   Colors,
   Typography,
-} from '../../theme';
+}from '../../theme';
 
 const SORT_OPTIONS = [
   {id: 'default', label: 'Recommended'},

@@ -11,7 +11,7 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import {
   Colors,
   Radius,
-} from '../../theme';
+}from '../../theme';
 
 const SearchBar = ({value, onChangeText, onFilterPress}) => {
   return (

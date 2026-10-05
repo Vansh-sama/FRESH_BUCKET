@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {Colors, Spacing, Radius, Typography} from '../theme';
+import {Colors, Spacing, Radius, Typography} from '../../theme';
 
 // A single promo card. Home renders a few of these in a horizontal
 // ScrollView. Kept as its own component so a future "Deals" screen can

@@ -1,7 +1,7 @@
 import React from 'react';
 import {TouchableOpacity, Text, View, StyleSheet} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {Colors, Spacing, Typography} from '../theme';
+import {Colors, Spacing, Typography} from '../../theme';
 
 // Vertical icon-over-label chip, the standard grocery-app category pattern.
 // `active` lets Home highlight whichever category the user has selected.
